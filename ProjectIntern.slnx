@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="InternProject.Data.Models/InternProject.Data.Models.csproj" />
-  <Project Path="InternProject.Data/InternProject.Data.csproj" />
+  <Project Path="InternProject.Data.Models/ProjectIntern.Data.Models.csproj" />
+  <Project Path="InternProject.Data/ProjectIntern.Data.csproj" />
   <Project Path="ProjectIntern/ProjectIntern.csproj" />
 </Solution>

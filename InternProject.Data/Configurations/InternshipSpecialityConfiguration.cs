@@ -23,7 +23,7 @@ namespace InternProject.Data.Configurations
 
             builder.HasIndex(s => s.Name)
                     .IsUnique()
-                    .HasFilter("[IsDeleted] = 0"); // Only enforce uniqueness on non-deleted items
+                    .HasFilter("\"IsDeleted\" = FALSE");
 
             builder.HasQueryFilter(s => !s.IsDeleted);
         }

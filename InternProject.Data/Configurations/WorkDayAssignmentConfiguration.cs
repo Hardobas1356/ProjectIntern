@@ -23,7 +23,7 @@ namespace InternProject.Data.Configurations
 
             builder.HasIndex(wa => new { wa.InternId, wa.TopicId })
                 .IsUnique()
-                .HasFilter("[IsDeleted] = 0");
+                .HasFilter("\"IsDeleted\" = FALSE");
         }
     }
 }

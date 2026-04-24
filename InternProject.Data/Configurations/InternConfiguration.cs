@@ -19,7 +19,7 @@ namespace InternProject.Data.Configurations
                 .HasMaxLength(150);
 
             builder.Property(i => i.CreationDate)
-                .HasDefaultValueSql("CURRENT_TIMESTAMP)");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             builder.Property(i => i.LastAssignmentOrder)
                 .HasDefaultValue(0);
