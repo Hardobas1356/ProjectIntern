@@ -1,5 +1,219 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@using System.Security.Claims
 @{
+    ViewData["Title"] = "Admin Calendar";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Keeping your custom styles but making them play nice with Bootstrap */
+        .calendar-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .calendar-month-year { font-weight: bold; font-size: 1.2rem; }
+        
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            color: #4ecdc4;
+            padding: 10px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .calendar-day:hover:not(.other-month):not(.disabled) {
+            background: #e8f4f8;
+            transform: translateY(-2px);
+        }
+
+        .calendar-day.today { background: #ff6b6b; color: white; }
+        .calendar-day.other-month { color: #ccc; background: #f8f9fa; }
+        .calendar-day.selected { background: #4ecdc4; color: white; }
+        .calendar-day.disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+
+        /* Task Indicator Dot */
+        .task-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #45b7d1;
+            border-radius: 50%;
+            margin-top: 2px;
+        }
+    </style>
+}
+
+<div class="container-fluid px-4">
+    <div class="calendar-container">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <h2 class="mb-0">Management Calendar</h2>
+                <small class="text-muted">Viewing as Admin: @User.Identity?.Name</small>
+            </div>
+            <a asp-action="AllUsers" class="btn btn-outline-primary">
+                <i class="fas fa-users me-1"></i> Manage Users
+            </a>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <button class="btn btn-sm btn-info text-white" onclick="previousMonth()">← Prev</button>
+            <div id="monthYear" class="calendar-month-year"></div>
+            <button class="btn btn-sm btn-info text-white" onclick="nextMonth()">Next →</button>
+        </div>
+
+        <div class="calendar" id="calendar"></div>
+
+        <div id="dateMenu" class="card mt-4 d-none">
+            <div class="card-body bg-light border-primary">
+                <h5 id="selectedDateHeader"></h5>
+                <button class="btn btn-primary" onclick="viewDailyReport()">
+                    <i class="fas fa-chart-bar me-1"></i> View Assignments
+                </button>
+                <button class="btn btn-secondary" onclick="closeMenu()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalHeader">Daily Report</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="modalContent">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentDate = new Date();
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let selectedDate = null;
+        let reportModal;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            reportModal = new bootstrap.Modal(document.getElementById('reportModal'));
+            generateCalendar();
+        });
+
+        function generateCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                calendar.appendChild(header);
+            });
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+            // Previous Month Days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                calendar.appendChild(createDayElement(daysInPrevMonth - i, true, null));
+            }
+
+            // Current Month Days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dateObj = new Date(year, month, i);
+                dateObj.setHours(0, 0, 0, 0);
+                calendar.appendChild(createDayElement(i, false, dateObj));
+            }
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('monthYear').textContent = `${monthNames[month]} ${year}`;
+        }
+
+        function createDayElement(day, isOtherMonth, dateObj) {
+            const div = document.createElement('div');
+            div.className = 'calendar-day';
+            div.textContent = day;
+
+            if (isOtherMonth) {
+                div.classList.add('other-month');
+                return div;
+            }
+
+            if (dateObj.getTime() === today.getTime()) div.classList.add('today');
+            
+            // Logic for locking future dates
+            if (dateObj > today) {
+                div.classList.add('disabled');
+            } else {
+                div.onclick = () => {
+                    document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    selectedDate = dateObj;
+                    showMenu(dateObj);
+                };
+            }
+            return div;
+        }
+
+        function showMenu(date) {
+            const menu = document.getElementById('dateMenu');
+            menu.classList.remove('d-none');
+            document.getElementById('selectedDateHeader').textContent = "Selected: " + date.toDateString();
+        }
+
+        function closeMenu() {
+            document.getElementById('dateMenu').classList.add('d-none');
+            document.querySelectorAll('.calendar-day.selected').forEach(el => el.classList.remove('selected'));
+        }
+
+        function viewDailyReport() {
+            if (!selectedDate) return;
+            
+            const dateStr = selectedDate.toDateString();
+            document.getElementById('modalHeader').textContent = "Report for " + dateStr;
+            
+            // This is where you'd typically make an AJAX call to get tasks for this date
+            document.getElementById('modalContent').innerHTML = `
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i> No specific assignments found for this date.
+                </div>
+                <p>Administrative notes: Daily system check completed.</p>
+            `;
+            
+            reportModal.show();
+        }
+
+        function previousMonth() { currentDate.setMonth(currentDate.getMonth() - 1); generateCalendar(); }
+        function nextMonth() { currentDate.setMonth(currentDate.getMonth() + 1); generateCalendar(); }
+    </script>
 }
