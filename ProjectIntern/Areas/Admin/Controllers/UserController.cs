@@ -14,11 +14,13 @@ public class UserController : BaseAdminController
         this.logger = logger;
     }
 
+    [HttpGet]
     public IActionResult Index()
     {
         return View();
     }
 
+    [HttpGet]
     public async Task<IActionResult> AllUsers(string? searchTerm, int pageNumber = 1)
     {
         try
@@ -35,5 +37,41 @@ public class UserController : BaseAdminController
             TempData["ErrorMessage"] = "Could not load users at this time.";
             return RedirectToAction("Index", "Home", new { area = "" });
         }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SoftDeleteUser(Guid id)
+    {
+        try
+        {
+            await applicationUserService.SoftDeleteUserAsync(id);
+            TempData["SuccessMessage"] = "User has been successfully deactivated.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error deleting user {id}");
+            TempData["ErrorMessage"] = "Failed to delete the user.";
+        }
+
+        return RedirectToAction(nameof(AllUsers));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RestoreUser(Guid id)
+    {
+        try
+        {
+            await applicationUserService.RestoreUserAsync(id);
+            TempData["SuccessMessage"] = "User has been successfully restored.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error restoring user {id}");
+            TempData["ErrorMessage"] = "Failed to restore the user.";
+        }
+
+        return RedirectToAction(nameof(AllUsers));
     }
 }

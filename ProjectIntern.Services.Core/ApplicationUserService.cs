@@ -89,7 +89,10 @@ public class ApplicationUserService : IApplicationUserService
 
     public async Task RestoreUserAsync(Guid id)
     {
-        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString());
+        ApplicationUser? user = await userManager.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user != null && user.IsDeleted)
         {
             user.IsDeleted = false;
