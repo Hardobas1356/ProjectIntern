@@ -7,12 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ForumApp.GCommon\ForumApp.GCommon.csproj" />
     <ProjectReference Include="..\InternProject.Data.Models\ProjectIntern.Data.Models.csproj" />
     <ProjectReference Include="..\InternProject.Data\ProjectIntern.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
+    <ProjectReference Include="..\ProjectIntern.Web.ViewModels\ProjectIntern.Web.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>
