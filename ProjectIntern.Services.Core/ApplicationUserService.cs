@@ -7,21 +7,53 @@ using ProjectIntern.Web.ViewModels.ApplicationUser;
 using Microsoft.EntityFrameworkCore;
 
 using static ForumApp.GCommon.GlobalConstants;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using ProjectIntern.Services.Core.Repository.Interfaces;
 
 namespace ProjectIntern.Services.Core;
 
 public class ApplicationUserService : IApplicationUserService
 {
     private readonly UserManager<ApplicationUser> userManager;
+    private readonly IGenericRepository<InternshipSpeciality> internSpecialityRepo;
 
-    public ApplicationUserService(UserManager<ApplicationUser> userManager)
+    public ApplicationUserService(UserManager<ApplicationUser> userManager,
+        IGenericRepository<InternshipSpeciality> internSpecialityRepo)
     {
         this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+        this.internSpecialityRepo = internSpecialityRepo ?? throw new ArgumentNullException(nameof(internSpecialityRepo));
     }
 
-    public Task EditUserAsync(UserEditInputModel model)
+    public async Task EditUserAsync(UserEditInputModel model)
     {
-        throw new NotImplementedException();
+        ApplicationUser? user = await userManager.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Id == model.Id);
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {model.Id} not found.");
+        }
+
+        user.Name = model.Name;
+        user.University = model.University;
+        user.InternshipSpecialityId = model.InternshipSpecialityId;
+        user.InternshipStartDate = model.InternshipStartDate.HasValue
+                ? DateTime.SpecifyKind(model.InternshipStartDate.Value, DateTimeKind.Utc)
+                : null;
+
+        user.InternshipEndDate = model.InternshipEndDate.HasValue
+            ? DateTime.SpecifyKind(model.InternshipEndDate.Value, DateTimeKind.Utc)
+            : null;
+        user.LastAssignmentOrder = model.LastAssignmentOrder;
+
+        IdentityResult result = await userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to update user: {errors}");
+        }
     }
 
     public async Task<PaginatedResult<UserAdminViewModel>> GetAllUsersAdminAsync(int pageNumber, int pageSize, string? searchTerm, bool showDeleted = false)
@@ -73,9 +105,40 @@ public class ApplicationUserService : IApplicationUserService
         return await PaginatedResult<UserAdminViewModel>.CreateAsync(users, pageNumber, pageSize);
     }
 
-    public Task<UserEditInputModel> GetUserForEditAsync(Guid id)
+    public async Task<UserEditInputModel> GetUserForEditAsync(Guid id)
     {
-        throw new NotImplementedException();
+        ApplicationUser? user = await userManager.Users
+                .Include(u => u.InternshipSpeciality)
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {id} not found.");
+        }
+
+        IEnumerable<InternshipSpeciality> specialities = await internSpecialityRepo.GetAllAsync(asNoTracking: true);
+
+        UserEditInputModel model = new UserEditInputModel
+        {
+            Id = user.Id,
+            Name = user.Name,
+            University = user.University,
+            InternshipSpecialityId = user.InternshipSpecialityId,
+            InternshipSpecialityName = user.InternshipSpeciality?.Name,
+            InternshipStartDate = user.InternshipStartDate,
+            InternshipEndDate = user.InternshipEndDate,
+            LastAssignmentOrder = user.LastAssignmentOrder,
+
+            Specialities = specialities.Select(s => new SelectListItem
+            {
+                Value = s.InternshipSpecialityID.ToString(),
+                Text = s.Name,
+                Selected = s.InternshipSpecialityID == user.InternshipSpecialityId
+            }).ToList()
+        };
+
+        return model;
     }
 
     public async Task MakeAdminAsync(Guid id)
@@ -114,5 +177,18 @@ public class ApplicationUserService : IApplicationUserService
             user.IsDeleted = true;
             await userManager.UpdateAsync(user);
         }
+    }
+
+    private async Task<ApplicationUser> ValidateUserExists(Guid id)
+    {
+        ApplicationUser? user = await userManager
+            .FindByIdAsync(id.ToString());
+
+        if (user == null)
+        {
+            throw new ArgumentException($"User with id {id} not found");
+        }
+
+        return user;
     }
 }

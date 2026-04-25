@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjectIntern.Services.Core.Interfaces;
+using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
 
 namespace ProjectIntern.Areas.Admin.Controllers;
 
@@ -37,6 +38,57 @@ public class UserController : BaseAdminController
             logger.LogError(ex, "Error occurred while fetching users in Admin Area.");
             TempData["ErrorMessage"] = "Could not load users at this time.";
             return RedirectToAction("Index", "Home", new { area = "" });
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetUserForEdit(Guid id)
+    {
+        try
+        {
+            UserEditInputModel model = await applicationUserService.GetUserForEditAsync(id);
+            return View(model);
+        }
+        catch (KeyNotFoundException)
+        {
+            TempData["ErrorMessage"] = "User not found.";
+            return RedirectToAction(nameof(AllUsers));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error fetching user {id} for edit.");
+            TempData["ErrorMessage"] = "An error occurred while loading the user data.";
+            return RedirectToAction(nameof(AllUsers));
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditUser(UserEditInputModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
+            model.Specialities = refreshedModel.Specialities;
+
+            return View("GetUserForEdit", model);
+        }
+
+        try
+        {
+            await applicationUserService.EditUserAsync(model);
+            TempData["SuccessMessage"] = "User details updated successfully.";
+            return RedirectToAction(nameof(AllUsers));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error updating user {model.Id}.");
+            TempData["ErrorMessage"] = "Failed to update user details.";
+
+            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
+            model.Specialities = refreshedModel.Specialities;
+
+            return View("GetUserForEdit", model);
         }
     }
 
