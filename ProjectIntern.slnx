@@ -2,6 +2,7 @@
   <Project Path="ForumApp.GCommon/ForumApp.GCommon.csproj" Id="043f9045-64fd-4ece-8f5b-70409d510b7f" />
   <Project Path="InternProject.Data.Models/ProjectIntern.Data.Models.csproj" />
   <Project Path="InternProject.Data/ProjectIntern.Data.csproj" />
+  <Project Path="ProjectIntern.Data.Seeding/ProjectIntern.Data.Seeding.csproj" Id="9d172862-2d18-4506-8556-ba8e11af7e55" />
   <Project Path="ProjectIntern.Services.Core/ProjectIntern.Services.Core.csproj" Id="74603439-42f7-4d42-a2a6-97962a833437" />
   <Project Path="ProjectIntern.Web.ViewModels/ProjectIntern.Web.ViewModels.csproj" Id="ba95f712-dea8-4fe9-b8fc-ee89999fdbad" />
   <Project Path="ProjectIntern/ProjectIntern.csproj" />

@@ -6,8 +6,6 @@ namespace ProjectIntern.Services.Core.Interfaces;
 
 public interface IApplicationUserService
 {
-    public Task<ICollection<UserViewModel>?> SearchUsersByNameAsync(Guid boardId,
-    string name);
     public Task<PaginatedResult<UserAdminViewModel>> GetAllUsersAdminAsync(
         int pageNumber, int pageSize, string? searchTerm);
     public Task<UserEditInputModel> GetUserForEditAsync(Guid id);

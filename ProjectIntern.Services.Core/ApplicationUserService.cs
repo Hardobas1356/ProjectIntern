@@ -12,7 +12,12 @@ namespace ProjectIntern.Services.Core;
 
 public class ApplicationUserService : IApplicationUserService
 {
-    private UserManager<ApplicationUser> userManager;
+    private readonly UserManager<ApplicationUser> userManager;
+
+    public ApplicationUserService(UserManager<ApplicationUser> userManager)
+    {
+        this.userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+    }
 
     public Task EditUserAsync(UserEditInputModel model)
     {
@@ -33,7 +38,8 @@ public class ApplicationUserService : IApplicationUserService
             query = query
                 .Where(u => !String.IsNullOrWhiteSpace(u.Name)
                     && (u.NormalizedUserName!.Contains(loweredSearchTerm)
-                        || u.NormalizedEmail!.Contains(loweredSearchTerm)));
+                        || u.NormalizedEmail!.Contains(loweredSearchTerm))
+                        || u.Name!.ToLower().Contains(loweredSearchTerm));
         }
 
         IQueryable<UserAdminViewModel> users = query
@@ -52,7 +58,9 @@ public class ApplicationUserService : IApplicationUserService
                     : "N/A",
 
                 University = u.University ?? "N/A",
-                InternshipSpeciality = u.InternshipSpeciality == null ? "N/A" : u.InternshipSpeciality.Name,
+                InternshipSpeciality = u.InternshipSpeciality != null
+                    ? u.InternshipSpeciality.Name
+                    : "No Speciality (Admin/Unassigned)",
                 LastAssignmentOrder = u.LastAssignmentOrder,
                 IsDeleted = u.IsDeleted,
             });
@@ -80,10 +88,6 @@ public class ApplicationUserService : IApplicationUserService
         throw new NotImplementedException();
     }
 
-    public Task<ICollection<UserViewModel>?> SearchUsersByNameAsync(Guid boardId, string name)
-    {
-        throw new NotImplementedException();
-    }
 
     public Task SoftDeleteUserAsync(Guid id)
     {

@@ -22,6 +22,7 @@
     <ProjectReference Include="..\ForumApp.GCommon\ForumApp.GCommon.csproj" />
     <ProjectReference Include="..\InternProject.Data.Models\ProjectIntern.Data.Models.csproj" />
     <ProjectReference Include="..\InternProject.Data\ProjectIntern.Data.csproj" />
+    <ProjectReference Include="..\ProjectIntern.Data.Seeding\ProjectIntern.Data.Seeding.csproj" />
     <ProjectReference Include="..\ProjectIntern.Services.Core\ProjectIntern.Services.Core.csproj" />
     <ProjectReference Include="..\ProjectIntern.Web.ViewModels\ProjectIntern.Web.ViewModels.csproj" />
   </ItemGroup>

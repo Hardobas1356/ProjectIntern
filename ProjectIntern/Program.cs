@@ -2,6 +2,7 @@ using InternSolution.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Data;
+using ProjectIntern.Data.Seeding;
 using ProjectIntern.Services.Core;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository;
@@ -67,5 +68,19 @@ app.MapControllerRoute(
 
 app.MapRazorPages()
    .WithStaticAssets();
+
+using (var scope = app.Services.CreateScope())
+{
+    IServiceProvider services = scope.ServiceProvider;
+    try
+    {
+        await DbSeeder.SeedAdminAsync(services);
+    }
+    catch (Exception ex)
+    {
+        ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
+}
 
 app.Run();
