@@ -2,12 +2,16 @@ using InternSolution.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Data;
+using ProjectIntern.Services.Core;
+using ProjectIntern.Services.Core.Interfaces;
+using ProjectIntern.Services.Core.Repository;
+using ProjectIntern.Services.Core.Repository.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration
-    .GetConnectionString("DefaultConnection") 
+    .GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services
     .AddDbContext<ApplicationDbContext>(options =>
@@ -22,6 +26,14 @@ builder.Services
 
 builder.Services
     .AddControllersWithViews();
+
+builder
+    .Services
+    .AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+builder
+    .Services
+    .AddScoped<IApplicationUserService, ApplicationUserService>();
 
 var app = builder.Build();
 
@@ -43,6 +55,10 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapControllerRoute(
+    name: "MyAreas",
+    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

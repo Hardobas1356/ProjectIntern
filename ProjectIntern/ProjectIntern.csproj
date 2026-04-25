@@ -14,12 +14,16 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.6" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ForumApp.GCommon\ForumApp.GCommon.csproj" />
     <ProjectReference Include="..\InternProject.Data.Models\ProjectIntern.Data.Models.csproj" />
     <ProjectReference Include="..\InternProject.Data\ProjectIntern.Data.csproj" />
+    <ProjectReference Include="..\ProjectIntern.Services.Core\ProjectIntern.Services.Core.csproj" />
+    <ProjectReference Include="..\ProjectIntern.Web.ViewModels\ProjectIntern.Web.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>
