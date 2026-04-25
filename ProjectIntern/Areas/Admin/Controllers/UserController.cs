@@ -21,14 +21,15 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
-    public async Task<IActionResult> AllUsers(string? searchTerm, int pageNumber = 1)
+    public async Task<IActionResult> AllUsers(string? searchTerm, bool showDeleted, int pageNumber = 1)
     {
         try
         {
             int pageSize = 10;
-            var result = await applicationUserService.GetAllUsersAdminAsync(pageNumber, pageSize, searchTerm);
+            var result = await applicationUserService.GetAllUsersAdminAsync(pageNumber, pageSize, searchTerm, showDeleted);
 
             ViewData["SearchTerm"] = searchTerm;
+            ViewData["ShowDeleted"] = showDeleted;
             return View(result);
         }
         catch (Exception ex)

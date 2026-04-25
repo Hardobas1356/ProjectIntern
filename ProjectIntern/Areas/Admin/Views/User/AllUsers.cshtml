@@ -37,11 +37,11 @@
             </div>
         </div>
         <div class="card-body">
-            <form asp-area="Admin" asp-controller="User" asp-action="AllUsers" method="get" class="row g-3 mb-4">
+            <form asp-area="Admin" asp-controller="User" asp-action="AllUsers" method="get" class="row g-3 mb-4 align-items-center">
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" name="searchTerm" value="@ViewData["SearchTerm"]"
-                               class="form-control" placeholder="Search by name, email or username..." />
+                               class="form-control" placeholder="Search by name" />
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search"></i> Search
                         </button>
@@ -49,6 +49,14 @@
                         {
                             <a asp-action="AllUsers" class="btn btn-outline-secondary">Clear</a>
                         }
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="showDeleted" value="true" id="showDeleted"
+                        @(ViewData["ShowDeleted"] != null && (bool)ViewData["ShowDeleted"]! ? "checked" : "")
+                               onchange="this.form.submit()">
+                        <label class="form-check-label" for="showDeleted">Show Deleted Users</label>
                     </div>
                 </div>
             </form>

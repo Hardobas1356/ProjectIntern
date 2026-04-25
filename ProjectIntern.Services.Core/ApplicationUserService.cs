@@ -24,22 +24,27 @@ public class ApplicationUserService : IApplicationUserService
         throw new NotImplementedException();
     }
 
-    public async Task<PaginatedResult<UserAdminViewModel>> GetAllUsersAdminAsync(int pageNumber, int pageSize, string? searchTerm)
+    public async Task<PaginatedResult<UserAdminViewModel>> GetAllUsersAdminAsync(int pageNumber, int pageSize, string? searchTerm, bool showDeleted = false)
     {
         IQueryable<ApplicationUser> query = userManager.Users
             .Include(u => u.InternshipSpeciality)
             .AsNoTracking()
             .IgnoreQueryFilters();
 
+        if (!showDeleted)
+        {
+            query = query.Where(u => !u.IsDeleted);
+        }
+
         if (!String.IsNullOrWhiteSpace(searchTerm))
         {
             string loweredSearchTerm = searchTerm.ToLower();
 
-            query = query
-                .Where(u => !String.IsNullOrWhiteSpace(u.Name)
-                    && (u.NormalizedUserName!.Contains(loweredSearchTerm)
-                        || u.NormalizedEmail!.Contains(loweredSearchTerm))
-                        || u.Name!.ToLower().Contains(loweredSearchTerm));
+            query = query.Where(u =>
+                        (u.Name != null && u.Name.ToLower().Contains(loweredSearchTerm)) ||
+                        (u.NormalizedUserName != null && u.NormalizedUserName.Contains(loweredSearchTerm.ToUpper())) ||
+                        (u.NormalizedEmail != null && u.NormalizedEmail.Contains(loweredSearchTerm.ToUpper()))
+                    );
         }
 
         IQueryable<UserAdminViewModel> users = query
