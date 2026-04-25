@@ -24,7 +24,7 @@ public class ApplicationUserService : IApplicationUserService
         throw new NotImplementedException();
     }
 
-    public Task<PaginatedResult<UserAdminViewModel>> GetAllUsersAdminAsync(int pageNumber, int pageSize, string? searchTerm)
+    public async Task<PaginatedResult<UserAdminViewModel>> GetAllUsersAdminAsync(int pageNumber, int pageSize, string? searchTerm)
     {
         IQueryable<ApplicationUser> query = userManager.Users
             .Include(u => u.InternshipSpeciality)
@@ -65,7 +65,7 @@ public class ApplicationUserService : IApplicationUserService
                 IsDeleted = u.IsDeleted,
             });
 
-        return PaginatedResult<UserAdminViewModel>.CreateAsync(users, pageNumber, pageSize);
+        return await PaginatedResult<UserAdminViewModel>.CreateAsync(users, pageNumber, pageSize);
     }
 
     public Task<UserEditInputModel> GetUserForEditAsync(Guid id)
@@ -73,9 +73,13 @@ public class ApplicationUserService : IApplicationUserService
         throw new NotImplementedException();
     }
 
-    public Task MakeAdminAsync(Guid id)
+    public async Task MakeAdminAsync(Guid id)
     {
-        throw new NotImplementedException();
+        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString());
+        if (user != null)
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
     }
 
     public Task RemoveAdminAsync(Guid id, Guid actingUserId)
@@ -83,14 +87,24 @@ public class ApplicationUserService : IApplicationUserService
         throw new NotImplementedException();
     }
 
-    public Task RestoreUserAsync(Guid id)
+    public async Task RestoreUserAsync(Guid id)
     {
-        throw new NotImplementedException();
+        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString());
+        if (user != null && user.IsDeleted)
+        {
+            user.IsDeleted = false;
+            await userManager.UpdateAsync(user);
+        }
     }
 
 
-    public Task SoftDeleteUserAsync(Guid id)
+    public async Task SoftDeleteUserAsync(Guid id)
     {
-        throw new NotImplementedException();
+        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString());
+        if (user != null && !user.IsDeleted)
+        {
+            user.IsDeleted = true;
+            await userManager.UpdateAsync(user);
+        }
     }
 }
