@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="InternProject.Data.Models/ProjectIntern.Data.Models.csproj" />
   <Project Path="InternProject.Data/ProjectIntern.Data.csproj" />
+  <Project Path="ProjectIntern.Services.Core/ProjectIntern.Services.Core.csproj" Id="74603439-42f7-4d42-a2a6-97962a833437" />
+  <Project Path="ProjectIntern.Web.ViewModels/ProjectIntern.Web.ViewModels.csproj" Id="ba95f712-dea8-4fe9-b8fc-ee89999fdbad" />
   <Project Path="ProjectIntern/ProjectIntern.csproj" />
 </Solution>

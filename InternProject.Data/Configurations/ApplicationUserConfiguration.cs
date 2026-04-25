@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InternProject.Data.Configurations
 {
-    public class InternConfiguration : IEntityTypeConfiguration<Intern>
+    public class ApplicationUserConfiguration : IEntityTypeConfiguration<ApplicationUser>
     {
-        public void Configure(EntityTypeBuilder<Intern> builder)
+        public void Configure(EntityTypeBuilder<ApplicationUser> builder)
         {
             builder.HasKey(i => i.Id);
 
@@ -15,7 +15,6 @@ namespace InternProject.Data.Configurations
                 .HasMaxLength(100);
 
             builder.Property(i => i.University)
-                .IsRequired()
                 .HasMaxLength(150);
 
             builder.Property(i => i.CreationDate)
@@ -29,6 +28,7 @@ namespace InternProject.Data.Configurations
             builder.HasOne(i => i.InternshipSpeciality)
                 .WithMany(s => s.Interns)
                 .HasForeignKey(i => i.InternshipSpecialityId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(i => i.WorkDayAssignments)

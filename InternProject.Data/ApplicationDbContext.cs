@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore;
 namespace ProjectIntern.Data
 {
     public class ApplicationDbContext
-        : IdentityDbContext<Intern, IdentityRole<Guid>, Guid>
+        : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public virtual DbSet<Intern> Interns { get; set; } = null!;
+        public virtual DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
         public virtual DbSet<InternshipSpeciality> InternshipSpecialities { get; set; } = null!;
         public virtual DbSet<Topic> Topics { get; set; } = null!;
         public virtual DbSet<WorkDayAssignment> WorkDayAssignments { get; set; } = null!;

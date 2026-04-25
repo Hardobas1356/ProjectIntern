@@ -22,7 +22,7 @@ namespace ProjectIntern.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("InternSolution.Data.Models.Intern", b =>
+            modelBuilder.Entity("InternSolution.Data.Models.ApplicationUser", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -47,13 +47,13 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("InternshipEndDate")
+                    b.Property<DateTime?>("InternshipEndDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("InternshipSpecialityId")
+                    b.Property<Guid?>("InternshipSpecialityId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("InternshipStartDate")
+                    b.Property<DateTime?>("InternshipStartDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsDeleted")
@@ -99,7 +99,6 @@ namespace ProjectIntern.Data.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("University")
-                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("character varying(150)");
 
@@ -348,13 +347,12 @@ namespace ProjectIntern.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("InternSolution.Data.Models.Intern", b =>
+            modelBuilder.Entity("InternSolution.Data.Models.ApplicationUser", b =>
                 {
                     b.HasOne("InternSolution.Data.Models.InternshipSpeciality", "InternshipSpeciality")
                         .WithMany("Interns")
                         .HasForeignKey("InternshipSpecialityId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("InternshipSpeciality");
                 });
@@ -372,7 +370,7 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("InternSolution.Data.Models.WorkDayAssignment", b =>
                 {
-                    b.HasOne("InternSolution.Data.Models.Intern", "Intern")
+                    b.HasOne("InternSolution.Data.Models.ApplicationUser", "Intern")
                         .WithMany("WorkDayAssignments")
                         .HasForeignKey("InternId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -400,7 +398,7 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
-                    b.HasOne("InternSolution.Data.Models.Intern", null)
+                    b.HasOne("InternSolution.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -409,7 +407,7 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("InternSolution.Data.Models.Intern", null)
+                    b.HasOne("InternSolution.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -424,7 +422,7 @@ namespace ProjectIntern.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("InternSolution.Data.Models.Intern", null)
+                    b.HasOne("InternSolution.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -433,14 +431,14 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.HasOne("InternSolution.Data.Models.Intern", null)
+                    b.HasOne("InternSolution.Data.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("InternSolution.Data.Models.Intern", b =>
+            modelBuilder.Entity("InternSolution.Data.Models.ApplicationUser", b =>
                 {
                     b.Navigation("WorkDayAssignments");
                 });

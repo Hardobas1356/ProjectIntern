@@ -7,7 +7,7 @@
         public bool IsDeleted { get; set; } = false;
 
         public Guid InternId { get; set; }
-        public Intern Intern { get; set; } = null!;
+        public ApplicationUser Intern { get; set; } = null!;
         public Guid TopicId { get; set; }
         public Topic Topic { get; set; } = null!;
     }

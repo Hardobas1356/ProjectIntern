@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ProjectIntern.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -68,12 +68,12 @@ namespace ProjectIntern.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    InternshipStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    InternshipEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    University = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    InternshipStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    InternshipEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    University = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
                     LastAssignmentOrder = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
