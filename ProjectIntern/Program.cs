@@ -35,6 +35,9 @@ builder
 builder
     .Services
     .AddScoped<IApplicationUserService, ApplicationUserService>();
+builder
+    .Services
+    .AddScoped<ISpecialityService, SpecialityService>();
 
 var app = builder.Build();
 

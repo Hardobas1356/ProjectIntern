@@ -15,4 +15,8 @@
     <ProjectReference Include="..\ForumApp.GCommon\ForumApp.GCommon.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Admin\Topic\" />
+  </ItemGroup>
+
 </Project>
