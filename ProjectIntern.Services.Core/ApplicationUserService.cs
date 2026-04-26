@@ -60,6 +60,7 @@ public class ApplicationUserService : IApplicationUserService
     {
         IQueryable<ApplicationUser> query = userManager.Users
             .Include(u => u.InternshipSpeciality)
+            .OrderBy(u => u.Name)   
             .AsNoTracking()
             .IgnoreQueryFilters();
 
