@@ -6,9 +6,10 @@ namespace ProjectIntern.Services.Core.Interfaces;
 
 public interface ISpecialityService
 {
-    public Task SoftDeleteSpeciality(Guid id);
-    public Task RestoreSpeciality(Guid id); 
-    public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetails(Guid id);
-    public Task<PaginatedResult<InternshipSpecialityViewModel>> GetAllSpecialities(int pageNumber, int pageSize, string? searchTerm, bool includeDeleted);
+    public Task SoftDeleteSpecialityAsync(Guid id);
+    public Task RestoreSpecialityAsync(Guid id); 
+    public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id);
+    public Task<PaginatedResult<InternshipSpecialityViewModel>> GetAllSpecialitiesAsync(int pageNumber, int pageSize, string? searchTerm, bool includeDeleted);
+    public Task CreateSpecialityAsync(InternshipSpecialityCreateInputModel inputModel);
 
 }

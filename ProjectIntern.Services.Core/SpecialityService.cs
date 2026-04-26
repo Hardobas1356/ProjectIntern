@@ -15,7 +15,36 @@ public class SpecialityService : ISpecialityService
         this.specialityRepo = specialityRepo;
     }
 
-    public async Task<PaginatedResult<InternshipSpecialityViewModel>> GetAllSpecialities(int pageNumber, int pageSize, string? searchTerm, bool includeDeleted)
+    public async Task CreateSpecialityAsync(InternshipSpecialityCreateInputModel inputModel)
+    {
+        if (inputModel == null)
+            throw new ArgumentNullException(nameof(inputModel));
+
+        if (string.IsNullOrWhiteSpace(inputModel.Name))
+            throw new ArgumentException("Speciality name is required", nameof(inputModel.Name));
+
+        if (string.IsNullOrWhiteSpace(inputModel.Description))
+            throw new ArgumentException("Speciality description is required", nameof(inputModel.Description));
+
+        InternshipSpeciality speciality = new InternshipSpeciality()
+        {
+            Name = inputModel.Name.Trim(),
+            Description = inputModel.Description.Trim(),
+            IsDeleted = false,
+        };
+
+        try
+        {
+            await specialityRepo.AddAsync(speciality);
+            await specialityRepo.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Could not save the speciality to the database.", ex);
+        }
+    }
+
+    public async Task<PaginatedResult<InternshipSpecialityViewModel>> GetAllSpecialitiesAsync(int pageNumber, int pageSize, string? searchTerm, bool includeDeleted)
     {
         IQueryable<InternshipSpeciality> query = specialityRepo
             .GetQueryable(true, ignoreQueryFilters: includeDeleted);
@@ -39,17 +68,17 @@ public class SpecialityService : ISpecialityService
         return await PaginatedResult<InternshipSpecialityViewModel>.CreateAsync(result, pageNumber, pageSize);
     }
 
-    public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetails(Guid id)
+    public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public Task RestoreSpeciality(Guid id)
+    public Task RestoreSpecialityAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public Task SoftDeleteSpeciality(Guid id)
+    public Task SoftDeleteSpecialityAsync(Guid id)
     {
         throw new NotImplementedException();
     }
