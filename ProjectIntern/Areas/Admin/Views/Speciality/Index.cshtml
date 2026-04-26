@@ -74,14 +74,16 @@
                                     <td class="text-center">
                                         @if (!speciality.IsDeleted)
                                         {
-                                            <div class="btn-group btn-group-sm">
-                                                <a asp-action="Edit" asp-route-id="@speciality.Id" class="btn btn-warning" title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a asp-action="Edit" asp-route-id="@speciality.Id" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i> Edit
                                                 </a>
-                                                <form asp-action="SoftDeleteSpeciality" asp-route-id="@speciality.Id" method="post" onsubmit="return confirm('Archive this speciality?');">
+            
+                                                <form asp-action="SoftDeleteSpeciality" asp-route-id="@speciality.Id" method="post"
+                                                      onsubmit="return confirm('Archive this speciality?');" class="d-inline">
                                                     @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-danger" title="Delete">
-                                                        <i class="fas fa-trash"></i>
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash"></i> Delete
                                                     </button>
                                                 </form>
                                             </div>
@@ -91,7 +93,7 @@
                                             <form asp-action="RestoreSpeciality" asp-route-id="@speciality.Id" method="post">
                                                 @Html.AntiForgeryToken()
                                                 <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-undo me-1"></i> Restore
+                                                    <i class="fas fa-undo"></i> Restore
                                                 </button>
                                             </form>
                                         }
