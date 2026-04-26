@@ -8,7 +8,7 @@ namespace InternProject.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<Topic> builder)
         {
-            builder.HasKey(t => t.TopicID);
+            builder.HasKey(t => t.Id);
 
             builder.Property(t => t.Name)
                 .IsRequired()

@@ -2,7 +2,7 @@
 {
     public class InternshipSpeciality
     {
-        public Guid InternshipSpecialityID { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public bool IsDeleted { get; set; } = false;

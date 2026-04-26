@@ -60,7 +60,7 @@ public class SpecialityService : ISpecialityService
             .OrderBy(s => s.Name)
             .Select(s => new InternshipSpecialityViewModel
             {
-                Id = s.InternshipSpecialityID,
+                Id = s.Id,
                 Name = s.Name,
                 IsDeleted = s.IsDeleted
             });
@@ -73,13 +73,50 @@ public class SpecialityService : ISpecialityService
         throw new NotImplementedException();
     }
 
-    public Task RestoreSpecialityAsync(Guid id)
+    public async Task RestoreSpecialityAsync(Guid id)
     {
-        throw new NotImplementedException();
+        if (id == Guid.Empty)
+        {
+            throw new ArgumentException("SpecialityId is null", nameof(id));
+        }
+
+        InternshipSpeciality? speciality = await specialityRepo
+            .GetByIdAsync(id,
+                          asNoTracking: false,
+                          ignoreQueryFilters: true);
+
+        if (speciality == null)
+        {
+            throw new ArgumentException("Speciality not found with Id", nameof(id));
+        }
+
+        try
+        {
+            speciality.IsDeleted = false;
+            await specialityRepo.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed to restore speciality", e);
+        }
     }
 
-    public Task SoftDeleteSpecialityAsync(Guid id)
+    public async Task SoftDeleteSpecialityAsync(Guid id)
     {
-        throw new NotImplementedException();
+        InternshipSpeciality? speciality = await specialityRepo
+            .GetByIdAsync(id, asNoTracking: false);
+
+        if(speciality == null)
+            throw new ArgumentException("Speciality not found", nameof(id));
+
+        try
+        {
+            speciality.IsDeleted = true;
+            await specialityRepo.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed to soft delete speciality", e);
+        }
     }
 }

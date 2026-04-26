@@ -11,7 +11,7 @@ namespace InternProject.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkDayAssignment> builder)
         {
-            builder.HasKey(wa => wa.WorkDayAssigmentId);
+            builder.HasKey(wa => wa.Id);
 
             builder.Property(wa => wa.Date)
                 .IsRequired();

@@ -2,7 +2,7 @@
 {
     public class WorkDayAssignment
     {
-        public Guid WorkDayAssigmentId { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; } = Guid.NewGuid();
         public DateTime Date { get; set; }
         public bool IsDeleted { get; set; } = false;
 

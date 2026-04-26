@@ -132,9 +132,9 @@ public class ApplicationUserService : IApplicationUserService
 
             Specialities = specialities.Select(s => new SelectListItem
             {
-                Value = s.InternshipSpecialityID.ToString(),
+                Value = s.Id.ToString(),
                 Text = s.Name,
-                Selected = s.InternshipSpecialityID == user.InternshipSpecialityId
+                Selected = s.Id == user.InternshipSpecialityId
             }).ToList()
         };
 

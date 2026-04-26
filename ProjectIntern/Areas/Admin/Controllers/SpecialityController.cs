@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ProjectIntern.Services.Core;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
 
@@ -92,9 +93,40 @@ namespace ProjectIntern.Areas.Admin.Controllers
                 return View();
             }
         }
-        public async Task<ActionResult> Delete(Guid id)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> SoftDeleteSpeciality(Guid id)
         {
-            return View();
+            try
+            {
+                await specialityService.SoftDeleteSpecialityAsync(id);
+                TempData["SuccessMessage"] = "Speciality has been successfully deactivated.";
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error deleting speciality {id}");
+                TempData["ErrorMessage"] = "Failed to delete the speciality.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RestoreSpeciality(Guid id)
+        {
+            try
+            {
+                await specialityService.RestoreSpecialityAsync(id);
+                TempData["SuccessMessage"] = "Speciality has been successfully restored.";
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Error restoring speciality {id}");
+                TempData["ErrorMessage"] = "Failed to restore the speciality.";
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }

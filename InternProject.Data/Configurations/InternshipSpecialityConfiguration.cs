@@ -11,7 +11,7 @@ namespace InternProject.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<InternshipSpeciality> builder)
         {
-            builder.HasKey(s => s.InternshipSpecialityID);
+            builder.HasKey(s => s.Id);
 
             builder.Property(s => s.Name)
                 .IsRequired()
