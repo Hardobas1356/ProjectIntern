@@ -11,5 +11,7 @@ public interface ISpecialityService
     public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id);
     public Task<PaginatedResult<InternshipSpecialityViewModel>> GetAllSpecialitiesAsync(int pageNumber, int pageSize, string? searchTerm, bool includeDeleted);
     public Task CreateSpecialityAsync(InternshipSpecialityCreateInputModel inputModel);
+    public Task<InternshipSpecialityEditInputModel> GetSpecialityForEditAsync(Guid id);
+    public Task EditSpecialityAsync(InternshipSpecialityEditInputModel inputModel);
 
 }

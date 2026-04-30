@@ -17,6 +17,54 @@ public class SpecialityService : ISpecialityService
         this.specialityRepo = specialityRepo;
     }
 
+    public async Task<InternshipSpecialityEditInputModel> GetSpecialityForEditAsync(Guid id)
+    {
+        InternshipSpeciality? speciality = await specialityRepo
+            .GetByIdAsync(id, asNoTracking: false, ignoreQueryFilters: true);
+
+        if (speciality == null)
+            throw new ArgumentException("Speciality not found", nameof(id));
+
+        InternshipSpecialityEditInputModel model = new InternshipSpecialityEditInputModel()
+        {
+            Id = id,
+            Name = speciality.Name.Trim(),
+            Description = speciality.Description.Trim(),
+        };
+
+        return model;
+    }
+
+    public async Task EditSpecialityAsync(InternshipSpecialityEditInputModel inputModel)
+    {
+        if (inputModel == null)
+            throw new ArgumentNullException(nameof(inputModel));
+
+        if (string.IsNullOrWhiteSpace(inputModel.Name))
+            throw new ArgumentException("Speciality name is required", nameof(inputModel.Name));
+
+        if (string.IsNullOrWhiteSpace(inputModel.Description))
+            throw new ArgumentException("Speciality description is required", nameof(inputModel.Description));
+
+        InternshipSpeciality? speciality = await specialityRepo
+            .GetByIdAsync(inputModel.Id, asNoTracking: false, ignoreQueryFilters: true);
+
+        if (speciality == null)
+            throw new ArgumentException("Speciality not found", nameof(inputModel.Id));
+
+        speciality.Name = inputModel.Name;
+        speciality.Description = inputModel.Description;
+
+        try
+        {
+            await specialityRepo.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Could not save the edited speciality to the database.", ex);
+        }
+    }
+
     public async Task CreateSpecialityAsync(InternshipSpecialityCreateInputModel inputModel)
     {
         if (inputModel == null)
@@ -50,7 +98,7 @@ public class SpecialityService : ISpecialityService
     {
         IQueryable<InternshipSpeciality> query = specialityRepo
             .GetQueryable(true, ignoreQueryFilters: includeDeleted);
-        
+
         if (!string.IsNullOrEmpty(searchTerm))
         {
             string loweredSearchTerm = searchTerm.ToLower();
@@ -130,7 +178,7 @@ public class SpecialityService : ISpecialityService
         InternshipSpeciality? speciality = await specialityRepo
             .GetByIdAsync(id, asNoTracking: false);
 
-        if(speciality == null)
+        if (speciality == null)
             throw new ArgumentException("Speciality not found", nameof(id));
 
         try
@@ -143,4 +191,5 @@ public class SpecialityService : ISpecialityService
             throw new Exception("Failed to soft delete speciality", e);
         }
     }
+
 }

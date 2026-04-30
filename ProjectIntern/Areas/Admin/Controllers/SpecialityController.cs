@@ -16,7 +16,6 @@ namespace ProjectIntern.Areas.Admin.Controllers
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Index(string? searchTerm, bool showDeleted = false, int pageNumber = 1)
         {
             try
@@ -37,6 +36,7 @@ namespace ProjectIntern.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
         public async Task<ActionResult> Details(Guid id)
         {
             if (id == Guid.Empty)
@@ -98,22 +98,42 @@ namespace ProjectIntern.Areas.Admin.Controllers
             }
         }
 
+        [HttpGet]
         public async Task<ActionResult> Edit(Guid id)
         {
-            return View();
+            try
+            {
+                InternshipSpecialityEditInputModel model = await specialityService.GetSpecialityForEditAsync(id);
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while getting speciality for edit in Admin Area.");
+                TempData["ErrorMessage"] = "Could not edit speciality at this time.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(Guid id, IFormCollection collection)
+        public async Task<ActionResult> Edit(InternshipSpecialityEditInputModel model)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (!this.ModelState.IsValid)
+                {
+                    logger.LogWarning("Speciality edit form is invalid.");
+                    return View(model);
+                }
+
+                await specialityService.EditSpecialityAsync(model);
+                return RedirectToAction(nameof(Details), new { id = model.Id });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                logger.LogError(ex, "Error occurred while editing speciality in Admin Area.");
+                TempData["ErrorMessage"] = "Could not save the edited speciality at this time.";
+                return RedirectToAction(nameof(Index));
             }
         }
 
