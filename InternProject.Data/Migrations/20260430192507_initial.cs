@@ -30,14 +30,14 @@ namespace ProjectIntern.Data.Migrations
                 name: "InternshipSpecialities",
                 columns: table => new
                 {
-                    InternshipSpecialityID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InternshipSpecialities", x => x.InternshipSpecialityID);
+                    table.PrimaryKey("PK_InternshipSpecialities", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,7 +96,7 @@ namespace ProjectIntern.Data.Migrations
                         name: "FK_AspNetUsers_InternshipSpecialities_InternshipSpecialityId",
                         column: x => x.InternshipSpecialityId,
                         principalTable: "InternshipSpecialities",
-                        principalColumn: "InternshipSpecialityID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -104,21 +104,22 @@ namespace ProjectIntern.Data.Migrations
                 name: "Topics",
                 columns: table => new
                 {
-                    TopicID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     Order = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: false)
+                    InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: false),
+                    WordDayAssignmentId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Topics", x => x.TopicID);
+                    table.PrimaryKey("PK_Topics", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Topics_InternshipSpecialities_InternshipSpecialityId",
                         column: x => x.InternshipSpecialityId,
                         principalTable: "InternshipSpecialities",
-                        principalColumn: "InternshipSpecialityID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -211,7 +212,7 @@ namespace ProjectIntern.Data.Migrations
                 name: "WorkDayAssignments",
                 columns: table => new
                 {
-                    WorkDayAssigmentId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     InternId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -219,7 +220,7 @@ namespace ProjectIntern.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkDayAssignments", x => x.WorkDayAssigmentId);
+                    table.PrimaryKey("PK_WorkDayAssignments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_WorkDayAssignments_AspNetUsers_InternId",
                         column: x => x.InternId,
@@ -230,7 +231,7 @@ namespace ProjectIntern.Data.Migrations
                         name: "FK_WorkDayAssignments_Topics_TopicId",
                         column: x => x.TopicId,
                         principalTable: "Topics",
-                        principalColumn: "TopicID",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 

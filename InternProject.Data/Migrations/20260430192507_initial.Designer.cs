@@ -12,7 +12,7 @@ using ProjectIntern.Data;
 namespace ProjectIntern.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260425082212_initial")]
+    [Migration("20260430192507_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace ProjectIntern.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.6")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -125,7 +125,7 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("InternSolution.Data.Models.InternshipSpeciality", b =>
                 {
-                    b.Property<Guid>("InternshipSpecialityID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -142,7 +142,7 @@ namespace ProjectIntern.Data.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.HasKey("InternshipSpecialityID");
+                    b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique()
@@ -153,9 +153,10 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("InternSolution.Data.Models.Topic", b =>
                 {
-                    b.Property<Guid>("TopicID")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -176,7 +177,10 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.HasKey("TopicID");
+                    b.Property<Guid>("WordDayAssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("InternshipSpecialityId", "Order")
                         .HasDatabaseName("IX_Topic_Speciality_Order");
@@ -186,7 +190,7 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("InternSolution.Data.Models.WorkDayAssignment", b =>
                 {
-                    b.Property<Guid>("WorkDayAssigmentId")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
@@ -202,7 +206,7 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<Guid>("TopicId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("WorkDayAssigmentId");
+                    b.HasKey("Id");
 
                     b.HasIndex("Date")
                         .HasDatabaseName("IX_WorkDayAssignment_Date");

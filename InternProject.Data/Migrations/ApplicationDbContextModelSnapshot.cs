@@ -152,7 +152,8 @@ namespace ProjectIntern.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("Id");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -172,6 +173,9 @@ namespace ProjectIntern.Data.Migrations
 
                     b.Property<int>("Order")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("WordDayAssignmentId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
