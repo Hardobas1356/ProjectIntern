@@ -10,6 +10,9 @@ namespace InternProject.Data.Configurations
         {
             builder.HasKey(t => t.Id);
 
+            builder.Property(t => t.Id)
+                .HasColumnName("Id");
+
             builder.Property(t => t.Name)
                 .IsRequired()
                 .HasMaxLength(150);

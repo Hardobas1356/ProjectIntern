@@ -39,7 +39,30 @@ namespace ProjectIntern.Areas.Admin.Controllers
 
         public async Task<ActionResult> Details(Guid id)
         {
-            return View();
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                InternshipSpecialityDetailsViewModel viewModel
+                    = await specialityService.GetSpecialityDetailsAsync(id);
+
+                if (viewModel == null)
+                {
+                    TempData["ErrorMessage"] = "The requested speciality could not be found.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred while fetching details for Speciality {SpecialityId}", id);
+                TempData["ErrorMessage"] = "An error occurred while loading the details.";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpGet]

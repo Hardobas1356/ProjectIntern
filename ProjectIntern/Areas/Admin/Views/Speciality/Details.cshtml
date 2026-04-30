@@ -1,0 +1,131 @@
+﻿@using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality
+@model InternshipSpecialityDetailsViewModel
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-end mt-4 mb-3">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a asp-action="Index">Specialities</a></li>
+                    <li class="breadcrumb-item active">@Model.Name</li>
+                </ol>
+            </nav>
+            <h1>Details: @Model.Name</h1>
+        </div>
+        <div>
+            @* Edit Speciality Button *@
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="fas fa-edit"></i> Edit Speciality
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+
+    @* --- Speciality Summary Card --- *@
+    <div class="card mb-4 border-left-primary shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-9">
+                    <h5 class="text-primary text-uppercase mb-1">Description</h5>
+                    <p class="lead">@Model.Description</p>
+                </div>
+                <div class="col-md-3 border-start text-center">
+                    <h5 class="text-secondary text-uppercase mb-1">Status</h5>
+                    @if (Model.IsDeleted)
+                    {
+                        <span class="badge bg-danger p-2">Archived</span>
+                        <form asp-action="RestoreSpeciality" asp-route-id="@Model.Id" method="post" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-success w-100">Restore</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success p-2">Active</span>
+                        <form asp-action="SoftDeleteSpeciality" asp-route-id="@Model.Id" method="post" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100">Archive</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* --- Topics Management Section --- *@
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-book me-2"></i>Curriculum Topics</h5>
+            @* Add Topic Button - Passes the SpecialityId *@
+            <a asp-controller="Topic" asp-action="Create" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-success">
+                <i class="fas fa-plus"></i> Add New Topic
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 100px;" class="ps-4">Order</th>
+                        <th>Topic Name</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-right pe-4 text-center" style="width: 250px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Topics.Any())
+                    {
+                        foreach (var topic in Model.Topics)
+                        {
+                            <tr class="@(topic.IsDeleted ? "table-light opacity-75" : "")">
+                                <td class="ps-4">
+                                    <span class="badge bg-secondary"># @topic.Order</span>
+                                </td>
+                                <td><strong>@topic.Name</strong></td>
+                                <td class="text-center">
+                                    @if (topic.IsDeleted)
+                                    {
+                                        <span class="badge bg-danger">Deleted</span>
+                                    }
+                                    else
+                                    {
+
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        @if (!topic.IsDeleted)
+                                        {
+                                            <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.Id" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form asp-controller="Topic" asp-action="SoftDelete" asp-route-id="@topic.Id" method="post" onsubmit="return confirm('Delete this topic?');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="Topic" asp-action="Restore" asp-route-id="@topic.Id" method="post">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-undo"></i> Restore</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <em>No topics added to this speciality yet.</em>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

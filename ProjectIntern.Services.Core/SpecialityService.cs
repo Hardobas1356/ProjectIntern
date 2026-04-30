@@ -1,8 +1,10 @@
 ﻿using ForumApp.GCommon;
 using InternSolution.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
+using ProjectIntern.Web.ViewModels.Admin.Topic;
 
 namespace ProjectIntern.Services.Core;
 
@@ -68,9 +70,31 @@ public class SpecialityService : ISpecialityService
         return await PaginatedResult<InternshipSpecialityViewModel>.CreateAsync(result, pageNumber, pageSize);
     }
 
-    public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id)
+    public async Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id)
     {
-        throw new NotImplementedException();
+        InternshipSpeciality? speciality = await specialityRepo.GetQueryable(asNoTracking: true, ignoreQueryFilters: true)
+            .Include(s => s.Topics)
+            .FirstOrDefaultAsync(s => s.Id == id);
+
+        if (speciality == null)
+            throw new ArgumentException("Speciality not found");
+
+        return new InternshipSpecialityDetailsViewModel
+        {
+            Id = speciality.Id,
+            Name = speciality.Name,
+            Description = speciality.Description,
+            IsDeleted = speciality.IsDeleted,
+            Topics = speciality.Topics
+                .OrderBy(t => t.Order)
+                .Select(t => new TopicAdminViewModel
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Order = t.Order,
+                    IsDeleted = t.IsDeleted
+                })
+        };
     }
 
     public async Task RestoreSpecialityAsync(Guid id)

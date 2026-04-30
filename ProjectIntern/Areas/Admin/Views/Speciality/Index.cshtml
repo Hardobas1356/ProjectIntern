@@ -73,31 +73,39 @@
                                         }
                                     </td>
                                     <td class="text-center">
-                                        @if (!speciality.IsDeleted)
-                                        {
-                                            <div class="d-flex justify-content-center gap-2">
-                                                <a asp-action="Edit" asp-route-id="@speciality.Id" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-edit"></i> Edit
-                                                </a>
+                                        <div class="d-flex justify-content-center gap-2">
+                                            @* Add Details Button *@
+                                            <a asp-action="Details" asp-route-id="@speciality.Id" class="btn btn-sm btn-info text-white">
+                                                <i class="fas fa-eye"></i> Details
+                                            </a>
+
+                                            @if (!speciality.IsDeleted)
+                                            {
+
+                                                <div class="d-flex justify-content-center gap-2">
+                                                    <a asp-action="Edit" asp-route-id="@speciality.Id" class="btn btn-sm btn-warning">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
             
-                                                <form asp-action="SoftDeleteSpeciality" asp-route-id="@speciality.Id" method="post"
-                                                      onsubmit="return confirm('Archive this speciality?');" class="d-inline">
+                                                    <form asp-action="SoftDeleteSpeciality" asp-route-id="@speciality.Id" method="post"
+                                                          onsubmit="return confirm('Archive this speciality?');" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="submit" class="btn btn-sm btn-danger">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="RestoreSpeciality" asp-route-id="@speciality.Id" method="post">
                                                     @Html.AntiForgeryToken()
-                                                    <button type="submit" class="btn btn-sm btn-danger">
-                                                        <i class="fas fa-trash"></i> Delete
+                                                    <button type="submit" class="btn btn-sm btn-success">
+                                                        <i class="fas fa-undo"></i> Restore
                                                     </button>
                                                 </form>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <form asp-action="RestoreSpeciality" asp-route-id="@speciality.Id" method="post">
-                                                @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-success">
-                                                    <i class="fas fa-undo"></i> Restore
-                                                </button>
-                                            </form>
-                                        }
+                                            }
+                                        </div>
                                     </td>
                                 </tr>
                             }

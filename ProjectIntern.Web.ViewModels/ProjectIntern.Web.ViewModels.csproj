@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Admin\Topic\" />
+    <Folder Include="Topic\" />
   </ItemGroup>
 
 </Project>
