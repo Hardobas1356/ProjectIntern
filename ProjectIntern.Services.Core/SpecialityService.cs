@@ -205,15 +205,15 @@ public class SpecialityService : ISpecialityService
         if (speciality == null)
             throw new ArgumentException("Speciality not found");
 
-        //to do: optimise this by creating a dictionary of topics and then iterating through the orderedTopicIds
-        for (int i = 0; i < orderedTopicIds.Count; i++)
-        {
-            Guid currentId = orderedTopicIds[i];
-            Topic? topic = speciality.Topics.FirstOrDefault(t => t.Id == currentId);
+        Dictionary<Guid, int> idToOrderMap = orderedTopicIds
+        .Select((id, order) => new { id, order })
+        .ToDictionary(t => t.id, t => t.order);
 
-            if (topic != null)
+        foreach (var topic in speciality.Topics)
+        {
+            if (idToOrderMap.TryGetValue(topic.Id, out int newOrder))
             {
-                topic.Order = i;
+                topic.Order = newOrder;
             }
         }
 
