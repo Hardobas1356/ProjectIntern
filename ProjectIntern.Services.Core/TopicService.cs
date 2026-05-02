@@ -9,15 +9,48 @@ namespace ProjectIntern.Services.Core;
 public class TopicService : ITopicService
 {
     private readonly IGenericRepository<Topic> topicRepo;
+    private readonly IGenericRepository<InternshipSpeciality> specialityService;
 
-    public TopicService(IGenericRepository<Topic> topicRepo)
+    public TopicService(IGenericRepository<Topic> topicRepo, IGenericRepository<InternshipSpeciality> specialityService)
     {
         this.topicRepo = topicRepo;
+        this.specialityService = specialityService;
     }
 
-    public Task CreateTopicAsync(TopicCreateInputModel model, Guid specialityId)
+    public async Task CreateTopicAsync(TopicCreateInputModel model, Guid specialityId)
     {
-        throw new NotImplementedException();
+        InternshipSpeciality? speciality = await specialityService
+            .GetQueryable()
+            .FirstOrDefaultAsync(s => s.Id == specialityId);
+
+        if (speciality == null)
+        {
+            throw new InvalidOperationException($"Speciality not found. Id: {specialityId}");
+        }
+
+        int nextOrder = await topicRepo.GetQueryable()
+                .Where(t => t.InternshipSpecialityId == model.InternshipSpecialityId)
+                .CountAsync();
+
+        Topic topic = new Topic()
+        {
+            Id = Guid.NewGuid(),
+            Name = model.Name,
+            Description = model.Description,
+            Order = nextOrder,
+            IsDeleted = false,
+            InternshipSpecialityId = specialityId,
+        };
+
+        try
+        {
+            await topicRepo.AddAsync(topic);
+            await topicRepo.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error while creating topic", ex);
+        }
     }
 
     public Task EditTopicAsync(TopicEditInputModel model)

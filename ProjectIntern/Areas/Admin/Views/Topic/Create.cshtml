@@ -1,0 +1,53 @@
+﻿@model ProjectIntern.Web.ViewModels.Admin.Topic.TopicCreateInputModel
+
+<div class="container-fluid px-4">
+    <div class="mt-4 mb-4">
+        <h1>Add Topic to Speciality</h1>
+        <p class="text-muted">Fill in the details below to add a new curriculum topic.</p>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>New Topic Details</h5>
+        </div>
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                @* Hidden Fields: Crucial for linking and validation *@
+                <input type="hidden" asp-for="InternshipSpecialityId" />
+                <input type="hidden" asp-for="Order" value="0" />
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label fw-bold"></label>
+                    <input asp-for="Name" class="form-control form-control-lg" placeholder="e.g. Introduction to cyber security..." />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <div class="form-text">Minimum 4 characters, maximum 150.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label fw-bold"></label>
+                    <textarea asp-for="Description" class="form-control" rows="6" placeholder="Describe the learning objectives..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                    <div class="form-text">Minimum 8 characters. You can use markdown or plain text.</div>
+                </div>
+
+                <hr class="my-4" />
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-controller="Speciality" asp-action="Details" asp-route-id="@Model.InternshipSpecialityId" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary px-5">
+                        <i class="fas fa-check-circle me-1"></i> Create Topic
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

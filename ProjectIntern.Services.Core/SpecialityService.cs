@@ -192,4 +192,37 @@ public class SpecialityService : ISpecialityService
         }
     }
 
+    public async Task ReorderTopicsAsync(Guid specialityId, List<Guid> orderedTopicIds)
+    {
+        if (orderedTopicIds == null || !orderedTopicIds.Any())
+            return;
+
+        InternshipSpeciality? speciality = await specialityRepo
+            .GetQueryable(asNoTracking: false, ignoreQueryFilters: true)
+            .Include(s => s.Topics)
+            .FirstOrDefaultAsync(s => s.Id == specialityId);
+
+        if (speciality == null)
+            throw new ArgumentException("Speciality not found");
+
+        for (int i = 0; i < orderedTopicIds.Count; i++)
+        {
+            Guid currentId = orderedTopicIds[i];
+            Topic? topic = speciality.Topics.FirstOrDefault(t => t.Id == currentId);
+
+            if (topic != null)
+            {
+                topic.Order = i;
+            }
+        }
+
+        try
+        {
+            await specialityRepo.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Failed to save the new topic order.", ex);
+        }
+    }
 }

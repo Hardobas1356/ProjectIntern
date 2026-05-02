@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    @* --- Speciality Summary Card --- *@
+    @*Speciality Summary Card*@
     <div class="card mb-4 border-left-primary shadow-sm">
         <div class="card-body">
             <div class="row">
@@ -52,12 +52,12 @@
         </div>
     </div>
 
-    @* --- Topics Management Section --- *@
+    @* Topics Management Section *@
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-book me-2"></i>Curriculum Topics</h5>
             @* Add Topic Button - Passes the SpecialityId *@
-            <a asp-controller="Topic" asp-action="Create" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-success">
+            <a asp-area="Admin" asp-controller="Topic" asp-action="Create" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-success">
                 <i class="fas fa-plus"></i> Add New Topic
             </a>
         </div>
@@ -71,13 +71,15 @@
                         <th class="text-right pe-4 text-center" style="width: 250px;">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="sortable-topics">
                     @if (Model.Topics.Any())
                     {
-                        foreach (var topic in Model.Topics)
+                        foreach (var topic in Model.Topics.OrderBy(t => t.Order))
                         {
-                            <tr class="@(topic.IsDeleted ? "table-light opacity-75" : "")">
+                            <tr data-id="@topic.Id" class="@(topic.IsDeleted ? "table-light opacity-75" : "grab-handle")">
                                 <td class="ps-4">
+                                    @* Added a handle icon to indicate dragability *@
+                                    <i class="fas fa-grip-vertical me-2 text-muted"></i>
                                     <span class="badge bg-secondary"># @topic.Order</span>
                                 </td>
                                 <td><strong>@topic.Name</strong></td>
@@ -97,18 +99,18 @@
                                         @if (!topic.IsDeleted)
                                         {
                                             <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.Id" class="btn btn-sm btn-warning">
-                                                <i class="fas fa-edit"></i>
+                                                Edit <i class="fas fa-edit"></i>
                                             </a>
                                             <form asp-controller="Topic" asp-action="SoftDelete" asp-route-id="@topic.Id" method="post" onsubmit="return confirm('Delete this topic?');">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                <button type="submit" class="btn btn-sm btn-danger">Delete <i class="fas fa-trash"></i></button>
                                             </form>
                                         }
                                         else
                                         {
                                             <form asp-controller="Topic" asp-action="Restore" asp-route-id="@topic.Id" method="post">
                                                 @Html.AntiForgeryToken()
-                                                <button type="submit" class="btn btn-sm btn-success"><i class="fas fa-undo"></i> Restore</button>
+                                                <button type="submit" class="btn btn-sm btn-success">Restore <i class="fas fa-undo"></i></button>
                                             </form>
                                         }
                                     </div>
@@ -129,3 +131,37 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('sortable-topics');
+            
+        Sortable.create(el, {
+        animation: 150,
+        handle: '.grab-handle', // Only allow dragging from rows that aren't deleted
+        onEnd: function () {
+        // 1. Get IDs in the new order
+        var orderedIds = Array.from(el.children).map(tr => tr.getAttribute('data-id'));
+
+        // 2. Post the new order to the Controller
+        fetch('@Url.Action("Reorder", "Topic")', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json',
+        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+        },
+        body: JSON.stringify(orderedIds)
+        })
+        .then(response => {
+        if (response.ok) {
+        // Optional: Refresh page or update the # badges manually
+        window.location.reload();
+        }
+        });
+        }
+        });
+        });
+    </script>
+}

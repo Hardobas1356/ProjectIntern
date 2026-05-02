@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
@@ -170,6 +171,29 @@ namespace ProjectIntern.Areas.Admin.Controllers
                 TempData["ErrorMessage"] = "Failed to restore the speciality.";
             }
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reorder([FromBody] ReorderRequest model)
+        {
+            try
+            {
+                // specialityId can be passed via URL or inside the JSON body
+                await specialityService.ReorderTopicsAsync(model.SpecialityId, model.TopicIds);
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest("Could not reorder topics.");
+            }
+        }
+
+        // Simple DTO for the request
+        public class ReorderRequest
+        {
+            public Guid SpecialityId { get; set; }
+            public List<Guid> TopicIds { get; set; }
         }
     }
 }

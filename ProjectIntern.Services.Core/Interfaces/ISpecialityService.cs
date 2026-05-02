@@ -13,5 +13,6 @@ public interface ISpecialityService
     public Task CreateSpecialityAsync(InternshipSpecialityCreateInputModel inputModel);
     public Task<InternshipSpecialityEditInputModel> GetSpecialityForEditAsync(Guid id);
     public Task EditSpecialityAsync(InternshipSpecialityEditInputModel inputModel);
+    public Task ReorderTopicsAsync(Guid specialityId, List<Guid> orderedTopicIds);
 
 }

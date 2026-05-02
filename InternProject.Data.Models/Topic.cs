@@ -12,6 +12,5 @@
         public InternshipSpeciality InternshipSpeciality { get; set; } = null!;
         public virtual ICollection<WorkDayAssignment> WorkDayAssignments { get; set; }
             = new HashSet<WorkDayAssignment>();
-        public Guid WordDayAssignmentId { get; set; }
     }
 }

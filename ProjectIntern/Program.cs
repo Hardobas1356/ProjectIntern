@@ -38,6 +38,9 @@ builder
 builder
     .Services
     .AddScoped<ISpecialityService, SpecialityService>();
+builder
+    .Services
+    .AddScoped<ITopicService, TopicService>();
 
 var app = builder.Build();
 
