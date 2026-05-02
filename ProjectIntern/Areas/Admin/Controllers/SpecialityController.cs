@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core;
 using ProjectIntern.Services.Core.Interfaces;
@@ -175,25 +176,27 @@ namespace ProjectIntern.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reorder([FromBody] ReorderRequest model)
+        public async Task<IActionResult> Reorder([FromBody] ReorderTopicsRequest request)
         {
+            if (request == null || request.TopicIds.Count == 0)
+            {
+                return BadRequest("No topics to reorder.");
+            }
+
             try
             {
-                // specialityId can be passed via URL or inside the JSON body
-                await specialityService.ReorderTopicsAsync(model.SpecialityId, model.TopicIds);
+                await specialityService.ReorderTopicsAsync(request.SpecialityId, request.TopicIds);
                 return Ok();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Could not reorder topics.");
+                return StatusCode(500, ex.Message);
             }
         }
-
-        // Simple DTO for the request
-        public class ReorderRequest
+        public class ReorderTopicsRequest
         {
             public Guid SpecialityId { get; set; }
-            public List<Guid> TopicIds { get; set; }
+            public List<Guid> TopicIds { get; set; } = new();
         }
     }
 }

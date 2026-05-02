@@ -140,28 +140,46 @@
             
         Sortable.create(el, {
         animation: 150,
-        handle: '.grab-handle', // Only allow dragging from rows that aren't deleted
+        handle: '.grab-handle',
         onEnd: function () {
-        // 1. Get IDs in the new order
-        var orderedIds = Array.from(el.children).map(tr => tr.getAttribute('data-id'));
+        // 1. Instantly update the visual order numbers in the table
+        var rows = el.querySelectorAll('tr[data-id]');
+        var orderedIds = [];
 
-        // 2. Post the new order to the Controller
+        rows.forEach((row, index) => {
+        // Update the badge text (# 0, # 1, etc)
+        var badge = row.querySelector('.badge.bg-secondary');
+        if (badge) {
+        badge.textContent = '# ' + index;
+        }
+        // Collect the ID for the database update
+        orderedIds.push(row.getAttribute('data-id'));
+        });
+
+        // 2. Build the payload to match the ReorderTopicsRequest DTO
+        var payload = {
+        specialityId: '@Model.Id',
+        topicIds: orderedIds
+        };
+
+        // 3. Post to the Controller
         fetch('@Url.Action("Reorder", "Topic")', {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json',
         'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
         },
-        body: JSON.stringify(orderedIds)
+        body: JSON.stringify(payload)
         })
         .then(response => {
-        if (response.ok) {
-        // Optional: Refresh page or update the # badges manually
-        window.location.reload();
+        if (!response.ok) {
+        console.error("Server error during reorder");
+        // alert("Error saving order. Please refresh.");
+        }
+        })
+        .catch(error => console.error('Fetch error:', error));
         }
         });
-        }
         });
-        });
-    </script>
+    </script>}
 }
