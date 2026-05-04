@@ -49,13 +49,50 @@ public class TopicService : ITopicService
         }
         catch (Exception ex)
         {
-            throw new Exception("Error while creating topic", ex);
+            throw new DbUpdateException("Error while creating topic", ex);
         }
     }
 
-    public Task EditTopicAsync(TopicEditInputModel model)
+    public async Task<TopicEditInputModel> GetTopicForEdit(Guid topicId)
     {
-        throw new NotImplementedException();
+        Topic? topic = await topicRepo
+            .SingleOrDefaultAsync(s => s.Id == topicId, ignoreQueryFilters: true);
+
+        if (topic == null)
+        {
+            throw new InvalidOperationException($"Topic does not exist id: {topicId}");
+        }
+
+        TopicEditInputModel model = new TopicEditInputModel()
+        {
+            Id = topicId,
+            Name = topic.Name,
+            Description = topic.Description,
+        };
+
+        return model;
+    }
+    public async Task EditTopicAsync(TopicEditInputModel model)
+    {
+        Topic? topic = await topicRepo
+            .SingleOrDefaultAsync(s => s.Id == model.Id, asNoTracking: false, ignoreQueryFilters: true);
+
+        if (topic == null)
+        {
+            throw new InvalidOperationException($"Topic does not exist id: {model.Id}");
+        }
+
+        topic.Name = model.Name;
+        topic.Description = model.Description;
+
+        try
+        {
+            await topicRepo.SaveChangesAsync(); 
+        }
+        catch (Exception ex)
+        {
+            throw new DbUpdateException($"Could not edit topic. Id: {model.Id}");
+        }
     }
 
     public async Task<IEnumerable<TopicAdminViewModel>> GetAllTopicsForSpecialityAsync(Guid specialityId, bool includeDeleted)
