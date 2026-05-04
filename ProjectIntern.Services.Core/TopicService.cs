@@ -9,12 +9,14 @@ namespace ProjectIntern.Services.Core;
 public class TopicService : ITopicService
 {
     private readonly IGenericRepository<Topic> topicRepo;
+    private readonly IGenericRepository<InternshipSpeciality> specialityRepo;
     private readonly IGenericRepository<InternshipSpeciality> specialityService;
 
-    public TopicService(IGenericRepository<Topic> topicRepo, IGenericRepository<InternshipSpeciality> specialityService)
+    public TopicService(IGenericRepository<Topic> topicRepo, IGenericRepository<InternshipSpeciality> specialityService, IGenericRepository<InternshipSpeciality> specialityRepo)
     {
         this.topicRepo = topicRepo;
         this.specialityService = specialityService;
+        this.specialityRepo = specialityRepo;
     }
 
     public async Task CreateTopicAsync(TopicCreateInputModel model, Guid specialityId)
@@ -53,7 +55,7 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<TopicEditInputModel> GetTopicForEdit(Guid topicId)
+    public async Task<TopicEditInputModel> GetTopicForEdit(Guid topicId, Guid specialityId)
     {
         Topic? topic = await topicRepo
             .SingleOrDefaultAsync(s => s.Id == topicId, ignoreQueryFilters: true);
@@ -63,11 +65,18 @@ public class TopicService : ITopicService
             throw new InvalidOperationException($"Topic does not exist id: {topicId}");
         }
 
+        bool speciality = await specialityRepo.AnyAsync(s => s.Id == specialityId, ignoreQueryFilters: true);
+        if (!speciality)
+        {
+            throw new InvalidOperationException($"Speciality does not exist id: {specialityId}");
+        }
+
         TopicEditInputModel model = new TopicEditInputModel()
         {
             Id = topicId,
             Name = topic.Name,
             Description = topic.Description,
+            specialityId = specialityId
         };
 
         return model;
@@ -87,11 +96,11 @@ public class TopicService : ITopicService
 
         try
         {
-            await topicRepo.SaveChangesAsync(); 
+            await topicRepo.SaveChangesAsync();
         }
         catch (Exception ex)
         {
-            throw new DbUpdateException($"Could not edit topic. Id: {model.Id}");
+            throw new DbUpdateException($"Could not edit topic. Id: {model.Id}", ex);
         }
     }
 

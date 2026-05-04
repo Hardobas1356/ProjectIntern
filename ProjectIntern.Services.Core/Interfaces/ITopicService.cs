@@ -8,6 +8,6 @@ public interface ITopicService
     public Task SoftDeleteTopicAsync(Guid topicId);
     public Task RestoreTopicAsync(Guid topicId);
     public Task<IEnumerable<TopicAdminViewModel>> GetAllTopicsForSpecialityAsync(Guid specialityId, bool includeDeleted);
-    public Task<TopicEditInputModel> GetTopicForEdit(Guid topicId);
+    public Task<TopicEditInputModel> GetTopicForEdit(Guid topicId, Guid specialityId);
     public Task EditTopicAsync(TopicEditInputModel model);
 }
