@@ -110,7 +110,7 @@ public class TopicService : ITopicService
         IQueryable<Topic> query = topicRepo
             .GetQueryable(asNoTracking: true, ignoreQueryFilters: includeDeleted);
 
-        query = query.Where(t => t.Id == specialityId);
+        query = query.Where(t => t.InternshipSpecialityId == specialityId);
 
         TopicAdminViewModel[] result = await query
             .OrderBy(t => t.Order)
