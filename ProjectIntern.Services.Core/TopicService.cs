@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.Topic;
+using System.Diagnostics.Contracts;
 
 namespace ProjectIntern.Services.Core;
 
@@ -126,13 +127,47 @@ public class TopicService : ITopicService
         return result;
     }
 
-    public Task RestoreTopicAsync(Guid topicId)
+    public async Task RestoreTopicAsync(Guid id)
     {
-        throw new NotImplementedException();
+        Topic? topic = await topicRepo
+            .SingleOrDefaultAsync(s => s.Id == id, asNoTracking: false, ignoreQueryFilters: true);
+
+        if (topic == null)
+        {
+            throw new InvalidOperationException($"Topic does not exist id: {id}");
+        }
+
+        topic.IsDeleted = false;
+
+        try
+        {
+            await topicRepo.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new DbUpdateException($"Could not restore deleted topic. Id: {id}", ex);
+        }
     }
 
-    public Task SoftDeleteTopicAsync(Guid topicId)
+    public async Task SoftDeleteTopicAsync(Guid id)
     {
-        throw new NotImplementedException();
+        Topic? topic = await topicRepo
+            .SingleOrDefaultAsync(s => s.Id == id, asNoTracking: false, ignoreQueryFilters: false);
+
+        if (topic == null)
+        {
+            throw new InvalidOperationException($"Topic does not exist id: {id}");
+        }
+
+        topic.IsDeleted = true;
+
+        try
+        {
+           await topicRepo.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        { 
+            throw new DbUpdateException($"Could not delete topic. Id: {id}", ex);
+        }
     }
 }

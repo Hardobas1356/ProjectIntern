@@ -55,7 +55,7 @@ public class TopicController : BaseAdminController
 
             return RedirectToAction("Details", "Speciality", new { id = model.specialityId });
         }
-        catch(DbUpdateException ex)
+        catch (DbUpdateException ex)
         {
             logger.LogError(ex, $"Error saving edited topic for speciality {model.specialityId}");
             TempData["ErrorMessage"] = "Failed to save the edited topic.";
@@ -75,6 +75,42 @@ public class TopicController : BaseAdminController
     {
         TopicCreateInputModel model = new TopicCreateInputModel { InternshipSpecialityId = specialityId };
         return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> SoftDeleteTopic(Guid topicId, Guid specialityId)
+    {
+        try
+        {
+            await topicService.SoftDeleteTopicAsync(topicId);
+            TempData["SuccessMessage"] = "Topic has been successfully deleted.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error deleting topic {topicId}");
+            TempData["ErrorMessage"] = "Failed to delete the topic.";
+        }
+
+        return RedirectToAction("Details", "Speciality", new {id = specialityId});
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> RestoreTopic(Guid topicId, Guid specialityId)
+    {
+        try
+        {
+            await topicService.RestoreTopicAsync(topicId);
+            TempData["SuccessMessage"] = "Topic has been successfully restored.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error restoring topic {topicId}");
+            TempData["ErrorMessage"] = "Failed to restore the topic.";
+        }
+
+        return RedirectToAction("Details", "Speciality", new { id = specialityId });
     }
 
     [HttpPost]

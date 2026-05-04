@@ -100,14 +100,14 @@
                                             <a asp-controller="Topic" asp-action="Edit" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-warning">
                                                 Edit <i class="fas fa-edit"></i>
                                             </a>
-                                            <form asp-controller="Topic" asp-action="SoftDelete" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" method="post" onsubmit="return confirm('Delete this topic?');">
+                                            <form asp-controller="Topic" asp-action="SoftDeleteTopic" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" method="post" onsubmit="return confirm('Delete this topic?');">
                                                 @Html.AntiForgeryToken()
                                                 <button type="submit" class="btn btn-sm btn-danger">Delete <i class="fas fa-trash"></i></button>
                                             </form>
                                         }
                                         else
                                         {
-                                            <form asp-controller="Topic" asp-action="Restore" asp-route-id="@topic.Id" method="post">
+                                            <form asp-controller="Topic" asp-action="RestoreTopic" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" method="post">
                                                 @Html.AntiForgeryToken()
                                                 <button type="submit" class="btn btn-sm btn-success">Restore <i class="fas fa-undo"></i></button>
                                             </form>
