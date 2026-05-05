@@ -28,6 +28,7 @@ public class UserController : BaseAdminController
         try
         {
             int pageSize = 10;
+            if (pageNumber < 1) pageNumber = 1;
             var result = await applicationUserService.GetAllUsersAdminAsync(pageNumber, pageSize, searchTerm, showDeleted);
 
             ViewData["SearchTerm"] = searchTerm;
