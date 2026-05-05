@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ProjectIntern.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -62,6 +62,28 @@ namespace ProjectIntern.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Topics",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
+                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    Order = table.Column<int>(type: "integer", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Topics", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Topics_InternshipSpecialities_InternshipSpecialityId",
+                        column: x => x.InternshipSpecialityId,
+                        principalTable: "InternshipSpecialities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetUsers",
                 columns: table => new
                 {
@@ -71,8 +93,10 @@ namespace ProjectIntern.Data.Migrations
                     InternshipStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     InternshipEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     University = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
-                    LastAssignmentOrder = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    CompletedTopicsCount = table.Column<int>(type: "integer", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    HasCompletedCurriculum = table.Column<bool>(type: "boolean", nullable: false),
+                    LastAssignedTopicId = table.Column<Guid>(type: "uuid", nullable: true),
                     InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -98,29 +122,12 @@ namespace ProjectIntern.Data.Migrations
                         principalTable: "InternshipSpecialities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Topics",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
-                    Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
-                    Order = table.Column<int>(type: "integer", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    InternshipSpecialityId = table.Column<Guid>(type: "uuid", nullable: false),
-                    WordDayAssignmentId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Topics", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Topics_InternshipSpecialities_InternshipSpecialityId",
-                        column: x => x.InternshipSpecialityId,
-                        principalTable: "InternshipSpecialities",
+                        name: "FK_AspNetUsers_Topics_LastAssignedTopicId",
+                        column: x => x.LastAssignedTopicId,
+                        principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -215,12 +222,20 @@ namespace ProjectIntern.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedByUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     InternId = table.Column<Guid>(type: "uuid", nullable: false),
                     TopicId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WorkDayAssignments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkDayAssignments_AspNetUsers_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_WorkDayAssignments_AspNetUsers_InternId",
                         column: x => x.InternId,
@@ -232,7 +247,7 @@ namespace ProjectIntern.Data.Migrations
                         column: x => x.TopicId,
                         principalTable: "Topics",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -267,6 +282,11 @@ namespace ProjectIntern.Data.Migrations
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUser_LastAssignedTopicId",
+                table: "AspNetUsers",
+                column: "LastAssignedTopicId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_InternshipSpecialityId",
                 table: "AspNetUsers",
                 column: "InternshipSpecialityId");
@@ -290,19 +310,26 @@ namespace ProjectIntern.Data.Migrations
                 columns: new[] { "InternshipSpecialityId", "Order" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_WorkDayAssignment_CreatedByUserId",
+                table: "WorkDayAssignments",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WorkDayAssignment_Date",
                 table: "WorkDayAssignments",
-                column: "Date");
+                column: "Date")
+                .Annotation("Npgsql:IndexMethod", "brin");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkDayAssignments_InternId_TopicId",
+                name: "IX_WorkDayAssignment_Intern_Date",
                 table: "WorkDayAssignments",
-                columns: new[] { "InternId", "TopicId" },
+                columns: new[] { "InternId", "Date" },
                 unique: true,
-                filter: "\"IsDeleted\" = FALSE");
+                filter: "\"IsDeleted\" = FALSE")
+                .Annotation("Npgsql:IndexInclude", new[] { "TopicId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkDayAssignments_TopicId",
+                name: "IX_WorkDayAssignment_TopicId",
                 table: "WorkDayAssignments",
                 column: "TopicId");
         }
