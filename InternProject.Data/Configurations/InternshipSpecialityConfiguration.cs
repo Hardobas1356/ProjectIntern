@@ -1,31 +1,27 @@
 ﻿using InternSolution.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace InternProject.Data.Configurations
+namespace InternProject.Data.Configurations;
+
+public class InternshipSpecialityConfiguration : IEntityTypeConfiguration<InternshipSpeciality>
 {
-    public class InternshipSpecialityConfiguration : IEntityTypeConfiguration<InternshipSpeciality>
+    public void Configure(EntityTypeBuilder<InternshipSpeciality> builder)
     {
-        public void Configure(EntityTypeBuilder<InternshipSpeciality> builder)
-        {
-            builder.HasKey(s => s.Id);
+        builder.HasKey(s => s.Id);
 
-            builder.Property(s => s.Name)
+        builder.Property(s => s.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(s => s.Description)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(1000);
 
-            builder.Property(s => s.Description)
-                    .IsRequired()
-                    .HasMaxLength(1000);
+        builder.HasIndex(s => s.Name)
+                .IsUnique()
+                .HasFilter("\"IsDeleted\" = FALSE");
 
-            builder.HasIndex(s => s.Name)
-                    .IsUnique()
-                    .HasFilter("\"IsDeleted\" = FALSE");
-
-            builder.HasQueryFilter(s => !s.IsDeleted);
-        }
+        builder.HasQueryFilter(s => !s.IsDeleted);
     }
 }
