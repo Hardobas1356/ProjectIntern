@@ -13,7 +13,5 @@ public class TopicCreateInputModel
     [MaxLength(2000)]
     public string Description { get; set; } = null!;
     [Required]
-    public int Order { get; set; }
-    [Required]
     public Guid InternshipSpecialityId { get; set; }
 }
