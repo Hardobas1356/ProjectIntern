@@ -69,9 +69,14 @@
             </div>
 
             @*Save order*@
-            <button id="save-order-btn" class="btn btn-sm btn-primary d-none" onclick="saveOrder()">
-                <i class="fas fa-save"></i> Save Order
-            </button>
+            <div class="d-flex align-items-center gap-2">
+                <button id="save-order-btn" class="btn btn-sm btn-primary d-none" onclick="saveOrder()">
+                    <i class="fas fa-save"></i> Save Order
+                </button>
+                <small id="save-order-hint" class="text-warning d-none">
+                    <i class="fas fa-info-circle"></i> Only affects future assignments
+                </small>
+            </div>
 
             @* Add Topic Button*@
             <a asp-area="Admin" asp-controller="Topic" asp-action="Create" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-success">

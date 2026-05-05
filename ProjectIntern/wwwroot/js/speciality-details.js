@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             hasUnsavedOrder = true;
             document.getElementById('save-order-btn').classList.remove('d-none');
+            document.getElementById('save-order-hint').classList.remove('d-none'); 
         }
     });
 });
@@ -77,11 +78,13 @@ function saveOrder() {
                     btn.classList.add('d-none');
                     btn.disabled = false;
                     btn.innerHTML = '<i class="fas fa-save"></i> Save Order';
+                    document.getElementById('save-order-hint').classList.add('d-none'); 
                 }, 1500);
             } else {
                 alert('Error saving order.');
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save"></i> Save Order';
+                document.getElementById('save-order-hint').classList.add('d-none'); 
             }
         })
         .catch(() => {
