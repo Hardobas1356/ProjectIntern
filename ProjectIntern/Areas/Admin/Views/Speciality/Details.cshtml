@@ -144,95 +144,16 @@
                     }
                 </tbody>
             </table>
+
+            <div id="speciality-data"
+                 data-speciality-id="@Model.Id"
+                 data-reorder-url="@Url.Action("Reorder", "Topic")">
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script>
-        var hasUnsavedOrder = false;
-
-        window.addEventListener('beforeunload', function (e) {
-        if (hasUnsavedOrder) {
-        e.preventDefault();
-        e.returnValue = '';
-        }
-        });
-
-        var pendingOrder = [];
-
-        function toggleDeletedTopics(checkbox) {
-        var isChecked = checkbox.checked;
-        localStorage.setItem('includeDeletedTopics', isChecked);
-        var url = new URL(window.location.href);
-        if (isChecked) {
-        url.searchParams.set('includeDeletedTopics', 'true');
-        } else {
-        url.searchParams.delete('includeDeletedTopics');
-        }
-        window.location.href = url.toString();
-        }
-
-        function saveOrder() {
-        if (!pendingOrder.length) return;
-        var btn = document.getElementById('save-order-btn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-        fetch('@Url.Action("Reorder", "Topic")', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-        },
-        body: JSON.stringify({ specialityId: '@Model.Id', topicIds: pendingOrder })
-        })
-        .then(response => {
-        if (response.ok) {
-        hasUnsavedOrder = false;
-        btn.innerHTML = '<i class="fas fa-check"></i> Saved';
-        setTimeout(() => {
-        btn.classList.add('d-none');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> Save Order';
-        }, 1500);
-        } else {
-        alert('Error saving order.');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> Save Order';
-        }
-        })
-        .catch(() => {
-        alert('Network error.');
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-save"></i> Save Order';
-        });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-        var savedState = localStorage.getItem('includeDeletedTopics');
-        var checkbox = document.getElementById('toggleDeleted');
-        if (savedState !== null) {
-        checkbox.checked = (savedState === 'true');
-        }
-
-        var el = document.getElementById('sortable-topics');
-        Sortable.create(el, {
-        animation: 150,
-        handle: '.grab-handle',
-        onEnd: function () {
-        var rows = el.querySelectorAll('tr[data-id]');
-        pendingOrder = [];
-        rows.forEach((row, index) => {
-        var badge = row.querySelector('.badge.bg-secondary');
-        if (badge) badge.textContent = '# ' + index;
-        pendingOrder.push(row.getAttribute('data-id'));
-        });
-        hasUnsavedOrder = true;
-        document.getElementById('save-order-btn').classList.remove('d-none');
-        }
-        });
-        });
-    </script>
+    <script src="~/js/speciality-details.js"></script>
 }
