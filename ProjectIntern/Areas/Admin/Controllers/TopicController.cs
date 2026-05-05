@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-using ProjectIntern.Services.Core;
 using ProjectIntern.Services.Core.Interfaces;
+using ProjectIntern.Web.ViewModels.Admin.Requests;
 using ProjectIntern.Web.ViewModels.Admin.Topic;
 
 namespace ProjectIntern.Areas.Admin.Controllers;
@@ -71,7 +70,7 @@ public class TopicController : BaseAdminController
 
 
     [HttpGet]
-    public async Task<IActionResult> Create(Guid specialityId)
+    public IActionResult Create(Guid specialityId)
     {
         TopicCreateInputModel model = new TopicCreateInputModel { InternshipSpecialityId = specialityId };
         return View(model);
@@ -86,13 +85,18 @@ public class TopicController : BaseAdminController
             await topicService.SoftDeleteTopicAsync(topicId);
             TempData["SuccessMessage"] = "Topic has been successfully deleted.";
         }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning(ex, $"Cannot delete topic {topicId} — future assignments exist.");
+            TempData["ErrorMessage"] = ex.Message;
+        }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Error deleting topic {topicId}");
             TempData["ErrorMessage"] = "Failed to delete the topic.";
         }
 
-        return RedirectToAction("Details", "Speciality", new {id = specialityId});
+        return RedirectToAction("Details", "Speciality", new { id = specialityId });
     }
 
     [HttpPost]
@@ -148,13 +152,7 @@ public class TopicController : BaseAdminController
         catch (Exception ex)
         {
             logger.LogError(ex, $"Error reordering topics for speciality {request.SpecialityId}");
-            return BadRequest("Could not reorder topics.");
+            return StatusCode(500, "Could not reorder topics.");
         }
     }
-    public class ReorderRequest
-    {
-        public Guid SpecialityId { get; set; }
-        public List<Guid>? TopicIds { get; set; }
-    }
-
 }
