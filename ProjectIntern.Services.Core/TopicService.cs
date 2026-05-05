@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.Topic;
-using System.Diagnostics.Contracts;
 
 namespace ProjectIntern.Services.Core;
 
@@ -11,28 +10,24 @@ public class TopicService : ITopicService
 {
     private readonly IGenericRepository<Topic> topicRepo;
     private readonly IGenericRepository<InternshipSpeciality> specialityRepo;
-    private readonly IGenericRepository<InternshipSpeciality> specialityService;
 
-    public TopicService(IGenericRepository<Topic> topicRepo, IGenericRepository<InternshipSpeciality> specialityService, IGenericRepository<InternshipSpeciality> specialityRepo)
+    public TopicService(IGenericRepository<Topic> topicRepo, IGenericRepository<InternshipSpeciality> specialityRepo)
     {
         this.topicRepo = topicRepo;
-        this.specialityService = specialityService;
         this.specialityRepo = specialityRepo;
     }
 
     public async Task CreateTopicAsync(TopicCreateInputModel model, Guid specialityId)
     {
-        InternshipSpeciality? speciality = await specialityService
-            .GetQueryable()
-            .FirstOrDefaultAsync(s => s.Id == specialityId);
+        bool specialityExists = await specialityRepo
+            .AnyAsync(s => s.Id == specialityId);
 
-        if (speciality == null)
-        {
+        if (!specialityExists)
             throw new InvalidOperationException($"Speciality not found. Id: {specialityId}");
-        }
 
-        int nextOrder = await topicRepo.GetQueryable()
-                .Where(t => t.InternshipSpecialityId == model.InternshipSpecialityId)
+        int nextOrder = await topicRepo
+                .GetQueryable(ignoreQueryFilters: true)
+                .Where(t => t.InternshipSpecialityId == specialityId)
                 .CountAsync();
 
         Topic topic = new Topic()
