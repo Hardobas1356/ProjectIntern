@@ -2,6 +2,15 @@
 
 <div class="container-fluid px-4">
     <div class="mt-4 mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+                <li class="breadcrumb-item"><a asp-controller="Speciality" asp-action="Index">Specialities</a></li>
+                <li class="breadcrumb-item">
+                    <a asp-controller="Speciality" asp-action="Details" asp-route-id="@Model.InternshipSpecialityId">Details</a>
+                </li>
+                <li class="breadcrumb-item active">Add Topic</li>
+            </ol>
+        </nav>
         <h1>Add Topic to Speciality</h1>
         <p class="text-muted">Fill in the details below to add a new curriculum topic.</p>
     </div>
@@ -15,9 +24,7 @@
                 @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                @* Hidden Fields: Crucial for linking and validation *@
                 <input type="hidden" asp-for="InternshipSpecialityId" />
-                <input type="hidden" asp-for="Order" value="0" />
 
                 <div class="mb-3">
                     <label asp-for="Name" class="form-label fw-bold"></label>
