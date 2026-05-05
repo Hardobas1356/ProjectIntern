@@ -43,7 +43,7 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserForEdit(Guid id)
+    public async Task<IActionResult> Edit(Guid id)
     {
         try
         {
@@ -70,7 +70,7 @@ public class UserController : BaseAdminController
         if (!ModelState.IsValid)
         {
             await RefreshSpecialitiesAsync(model);
-            return View("GetUserForEdit", model);
+            return View("Edit", model);
         }
 
         try
@@ -89,7 +89,7 @@ public class UserController : BaseAdminController
             TempData["ErrorMessage"] = "Failed to update user details.";
 
             await RefreshSpecialitiesAsync(model);
-            return View("GetUserForEdit", model);
+            return View("Edit", model);
         }
     }
 

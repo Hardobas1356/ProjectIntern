@@ -22,6 +22,14 @@
     </div>
 }
 
+@if (TempData["WarningMessage"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["WarningMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="container-fluid px-4">
     <h1 class="mt-4">User Management</h1>
     <ol class="breadcrumb mb-4">
@@ -69,7 +77,7 @@
                             <th>Speciality</th>
                             <th>University</th>
                             <th>Joined Date</th>
-                            <th class="text-center">Progress Order</th>
+                            <th class="text-center">Progress</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -93,7 +101,18 @@
                                     <td>@user.University</td>
                                     <td>@user.CreationDate</td>
                                     <td class="text-center">
-                                        <span class="fw-bold text-primary">@user.LastAssignmentOrder</span>
+                                        @if (user.HasCompletedCurriculum)
+                                        {
+                                            <span class="badge bg-success">Completed</span>
+                                        }
+                                        else if (user.CompletedTopicsCount == 0)
+                                        {
+                                            <span class="badge bg-secondary">Not started</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-primary">@user.CompletedTopicsCount topics done</span>
+                                        }
                                     </td>
                                     <td class="text-center">
                                         @if (user.IsDeleted)
@@ -107,7 +126,7 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="btn-group btn-group-sm">
-                                            <a asp-action="GetUserForEdit" asp-route-id="@user.Id" class="btn btn-outline-warning" title="Edit">
+                                            <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-outline-warning" title="Edit">
                                                 Edit
                                             </a>
                                             @if (user.IsDeleted)
