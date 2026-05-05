@@ -4,7 +4,7 @@ namespace ForumApp.GCommon;
 
 public class PaginatedResult<T>
 {
-    public ICollection<T> Items { get; private set; } = new HashSet<T>();
+    public ICollection<T> Items { get; private set; } = new List<T>();
     public int TotalItems { get; private set; }
     public int PageIndex { get; private set; }
     public int PageSize { get; private set; }
