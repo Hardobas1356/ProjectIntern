@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
 
@@ -68,9 +69,7 @@ public class UserController : BaseAdminController
     {
         if (!ModelState.IsValid)
         {
-            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
-            model.Specialities = refreshedModel.Specialities;
-
+            await RefreshSpecialitiesAsync(model);
             return View("GetUserForEdit", model);
         }
 
@@ -78,6 +77,10 @@ public class UserController : BaseAdminController
         {
             await applicationUserService.EditUserAsync(model);
             TempData["SuccessMessage"] = "User details updated successfully.";
+
+            if (model.InternshipSpecialityId != null)
+                TempData["WarningMessage"] = "Speciality was changed — curriculum progress has been reset.";
+
             return RedirectToAction(nameof(AllUsers));
         }
         catch (Exception ex)
@@ -85,9 +88,7 @@ public class UserController : BaseAdminController
             logger.LogError(ex, $"Error updating user {model.Id}.");
             TempData["ErrorMessage"] = "Failed to update user details.";
 
-            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
-            model.Specialities = refreshedModel.Specialities;
-
+            await RefreshSpecialitiesAsync(model);
             return View("GetUserForEdit", model);
         }
     }
@@ -126,5 +127,18 @@ public class UserController : BaseAdminController
         }
 
         return RedirectToAction(nameof(AllUsers));
+    }
+
+    private async Task RefreshSpecialitiesAsync(UserEditInputModel model)
+    {
+        try
+        {
+            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
+            model.Specialities = refreshedModel.Specialities;
+        }
+        catch
+        {
+            model.Specialities = new List<SelectListItem>();
+        }
     }
 }

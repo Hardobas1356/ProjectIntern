@@ -11,4 +11,6 @@ public class UserAdminViewModel
     public string InternshipSpeciality { get; set; } = null!;
     public int LastAssignmentOrder { get; set; }
     public bool IsDeleted { get; set; } = false;
+    public int CompletedTopicsCount { get; set; } = 0;
+    public bool HasCompletedCurriculum { get; set; } = false;
 }
