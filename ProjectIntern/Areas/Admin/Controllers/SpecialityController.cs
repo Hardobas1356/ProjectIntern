@@ -39,7 +39,7 @@ namespace ProjectIntern.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> Details(Guid id)
+        public async Task<ActionResult> Details(Guid id, [FromQuery] bool includeDeletedTopics)
         {
             if (id == Guid.Empty)
             {
@@ -49,7 +49,7 @@ namespace ProjectIntern.Areas.Admin.Controllers
             try
             {
                 InternshipSpecialityDetailsViewModel viewModel
-                    = await specialityService.GetSpecialityDetailsAsync(id);
+                    = await specialityService.GetSpecialityDetailsAsync(id, includeDeletedTopics);
 
                 if (viewModel == null)
                 {

@@ -31,6 +31,9 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("integer");
 
+                    b.Property<int>("CompletedTopicsCount")
+                        .HasColumnType("integer");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("text");
@@ -47,6 +50,9 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("HasCompletedCurriculum")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime?>("InternshipEndDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -59,10 +65,8 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("LastAssignmentOrder")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
+                    b.Property<Guid?>("LastAssignedTopicId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -109,6 +113,9 @@ namespace ProjectIntern.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("InternshipSpecialityId");
+
+                    b.HasIndex("LastAssignedTopicId")
+                        .HasDatabaseName("IX_ApplicationUser_LastAssignedTopicId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -174,9 +181,6 @@ namespace ProjectIntern.Data.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("WordDayAssignmentId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("InternshipSpecialityId", "Order")
@@ -189,6 +193,12 @@ namespace ProjectIntern.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("CreatedByUserId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("Date")
@@ -205,14 +215,23 @@ namespace ProjectIntern.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedByUserId")
+                        .HasDatabaseName("IX_WorkDayAssignment_CreatedByUserId");
+
                     b.HasIndex("Date")
                         .HasDatabaseName("IX_WorkDayAssignment_Date");
 
-                    b.HasIndex("TopicId");
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Date"), "brin");
 
-                    b.HasIndex("InternId", "TopicId")
+                    b.HasIndex("TopicId")
+                        .HasDatabaseName("IX_WorkDayAssignment_TopicId");
+
+                    b.HasIndex("InternId", "Date")
                         .IsUnique()
+                        .HasDatabaseName("IX_WorkDayAssignment_Intern_Date")
                         .HasFilter("\"IsDeleted\" = FALSE");
+
+                    NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("InternId", "Date"), new[] { "TopicId" });
 
                     b.ToTable("WorkDayAssignments");
                 });
@@ -358,7 +377,14 @@ namespace ProjectIntern.Data.Migrations
                         .HasForeignKey("InternshipSpecialityId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("InternSolution.Data.Models.Topic", "LastAssignedTopic")
+                        .WithMany("ApplicationUsers")
+                        .HasForeignKey("LastAssignedTopicId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("InternshipSpeciality");
+
+                    b.Navigation("LastAssignedTopic");
                 });
 
             modelBuilder.Entity("InternSolution.Data.Models.Topic", b =>
@@ -374,6 +400,12 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("InternSolution.Data.Models.WorkDayAssignment", b =>
                 {
+                    b.HasOne("InternSolution.Data.Models.ApplicationUser", "CreatedByUser")
+                        .WithMany()
+                        .HasForeignKey("CreatedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("InternSolution.Data.Models.ApplicationUser", "Intern")
                         .WithMany("WorkDayAssignments")
                         .HasForeignKey("InternId")
@@ -383,8 +415,10 @@ namespace ProjectIntern.Data.Migrations
                     b.HasOne("InternSolution.Data.Models.Topic", "Topic")
                         .WithMany("WorkDayAssignments")
                         .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CreatedByUser");
 
                     b.Navigation("Intern");
 
@@ -456,6 +490,8 @@ namespace ProjectIntern.Data.Migrations
 
             modelBuilder.Entity("InternSolution.Data.Models.Topic", b =>
                 {
+                    b.Navigation("ApplicationUsers");
+
                     b.Navigation("WorkDayAssignments");
                 });
 #pragma warning restore 612, 618

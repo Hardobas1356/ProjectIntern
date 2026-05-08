@@ -3,7 +3,6 @@ using InternSolution.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
-using ProjectIntern.Web.ViewModels.ApplicationUser;
 using Microsoft.EntityFrameworkCore;
 
 using static ForumApp.GCommon.GlobalConstants;
@@ -35,6 +34,14 @@ public class ApplicationUserService : IApplicationUserService
             throw new KeyNotFoundException($"User with ID {model.Id} not found.");
         }
 
+        if (user.InternshipSpecialityId != model.InternshipSpecialityId)
+        {
+            user.InternshipSpecialityId = model.InternshipSpecialityId;
+            user.LastAssignedTopicId = null;
+            user.HasCompletedCurriculum = false;
+            user.CompletedTopicsCount = 0;
+        }
+
         user.Name = model.Name;
         user.University = model.University;
         user.InternshipSpecialityId = model.InternshipSpecialityId;
@@ -45,7 +52,6 @@ public class ApplicationUserService : IApplicationUserService
         user.InternshipEndDate = model.InternshipEndDate.HasValue
             ? DateTime.SpecifyKind(model.InternshipEndDate.Value, DateTimeKind.Utc)
             : null;
-        user.LastAssignmentOrder = model.LastAssignmentOrder;
 
         IdentityResult result = await userManager.UpdateAsync(user);
 
@@ -99,8 +105,9 @@ public class ApplicationUserService : IApplicationUserService
                 InternshipSpeciality = u.InternshipSpeciality != null
                     ? u.InternshipSpeciality.Name
                     : "No Speciality (Admin/Unassigned)",
-                LastAssignmentOrder = u.LastAssignmentOrder,
                 IsDeleted = u.IsDeleted,
+                CompletedTopicsCount = u.CompletedTopicsCount,
+                HasCompletedCurriculum = u.HasCompletedCurriculum,
             });
 
         return await PaginatedResult<UserAdminViewModel>.CreateAsync(users, pageNumber, pageSize);
@@ -129,7 +136,6 @@ public class ApplicationUserService : IApplicationUserService
             InternshipSpecialityName = user.InternshipSpeciality?.Name,
             InternshipStartDate = user.InternshipStartDate,
             InternshipEndDate = user.InternshipEndDate,
-            LastAssignmentOrder = user.LastAssignmentOrder,
 
             Specialities = specialities.Select(s => new SelectListItem
             {
@@ -144,16 +150,27 @@ public class ApplicationUserService : IApplicationUserService
 
     public async Task MakeAdminAsync(Guid id)
     {
-        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString());
+        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString())
+            ?? throw new KeyNotFoundException($"User with ID {id} not found.");
+
         if (user != null)
         {
             await userManager.AddToRoleAsync(user, "Admin");
         }
     }
 
-    public Task RemoveAdminAsync(Guid id, Guid actingUserId)
+    public async Task RemoveAdminAsync(Guid id, Guid actingUserId)
     {
-        throw new NotImplementedException();
+        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString())
+            ?? throw new KeyNotFoundException($"User with ID {id} not found.");
+
+        if (id == actingUserId)
+            throw new InvalidOperationException("You cannot remove your own admin role.");
+
+        if (user != null)
+        {
+            await userManager.RemoveFromRoleAsync(user, "Admin");
+        }
     }
 
     public async Task RestoreUserAsync(Guid id)
@@ -172,24 +189,14 @@ public class ApplicationUserService : IApplicationUserService
 
     public async Task SoftDeleteUserAsync(Guid id)
     {
-        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString());
+        ApplicationUser? user = await userManager.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user != null && !user.IsDeleted)
         {
             user.IsDeleted = true;
             await userManager.UpdateAsync(user);
         }
-    }
-
-    private async Task<ApplicationUser> ValidateUserExists(Guid id)
-    {
-        ApplicationUser? user = await userManager
-            .FindByIdAsync(id.ToString());
-
-        if (user == null)
-        {
-            throw new ArgumentException($"User with id {id} not found");
-        }
-
-        return user;
     }
 }

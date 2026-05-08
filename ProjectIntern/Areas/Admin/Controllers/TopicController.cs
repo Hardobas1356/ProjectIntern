@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.Elfie.Diagnostics;
-using ProjectIntern.Services.Core;
+using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
+using ProjectIntern.Web.ViewModels.Admin.Requests;
 using ProjectIntern.Web.ViewModels.Admin.Topic;
 
 namespace ProjectIntern.Areas.Admin.Controllers;
@@ -20,10 +20,101 @@ public class TopicController : BaseAdminController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Create(Guid specialityId)
+    public async Task<IActionResult> Edit(Guid topicId, Guid specialityId)
+    {
+        try
+        {
+            TopicEditInputModel model = await topicService.GetTopicForEdit(topicId, specialityId);
+
+            return View(model);
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogError(ex, $"Error editing topic for speciality. Topic ({topicId}) or speciality ({specialityId}) do not exist");
+            TempData["ErrorMessage"] = "Failed to edit the topic.";
+            return RedirectToAction("Index", "Speciality");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error editing topic for speciality {specialityId}");
+            TempData["ErrorMessage"] = "Failed to edit the topic.";
+            return RedirectToAction("Details", "Speciality", new { id = specialityId });
+        }
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(TopicEditInputModel model)
+    {
+        try
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            await topicService.EditTopicAsync(model);
+
+            return RedirectToAction("Details", "Speciality", new { id = model.specialityId });
+        }
+        catch (DbUpdateException ex)
+        {
+            logger.LogError(ex, $"Error saving edited topic for speciality {model.specialityId}");
+            TempData["ErrorMessage"] = "Failed to save the edited topic.";
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error editing topic for speciality {model.specialityId}");
+            TempData["ErrorMessage"] = "Failed to edit the topic.";
+            return View(model);
+        }
+    }
+
+
+    [HttpGet]
+    public IActionResult Create(Guid specialityId)
     {
         TopicCreateInputModel model = new TopicCreateInputModel { InternshipSpecialityId = specialityId };
         return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> SoftDeleteTopic(Guid topicId, Guid specialityId)
+    {
+        try
+        {
+            await topicService.SoftDeleteTopicAsync(topicId);
+            TempData["SuccessMessage"] = "Topic has been successfully deleted.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning(ex, $"Cannot delete topic {topicId} — future assignments exist.");
+            TempData["ErrorMessage"] = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error deleting topic {topicId}");
+            TempData["ErrorMessage"] = "Failed to delete the topic.";
+        }
+
+        return RedirectToAction("Details", "Speciality", new { id = specialityId });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<ActionResult> RestoreTopic(Guid topicId, Guid specialityId)
+    {
+        try
+        {
+            await topicService.RestoreTopicAsync(topicId);
+            TempData["SuccessMessage"] = "Topic has been successfully restored.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error restoring topic {topicId}");
+            TempData["ErrorMessage"] = "Failed to restore the topic.";
+        }
+
+        return RedirectToAction("Details", "Speciality", new { id = specialityId });
     }
 
     [HttpPost]
@@ -61,13 +152,7 @@ public class TopicController : BaseAdminController
         catch (Exception ex)
         {
             logger.LogError(ex, $"Error reordering topics for speciality {request.SpecialityId}");
-            return BadRequest("Could not reorder topics.");
+            return StatusCode(500, "Could not reorder topics.");
         }
     }
-    public class ReorderRequest
-    {
-        public Guid SpecialityId { get; set; }
-        public List<Guid> TopicIds { get; set; }
-    }
-
 }

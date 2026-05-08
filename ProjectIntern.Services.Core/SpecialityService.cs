@@ -11,10 +11,12 @@ namespace ProjectIntern.Services.Core;
 public class SpecialityService : ISpecialityService
 {
     private readonly IGenericRepository<InternshipSpeciality> specialityRepo;
+    private readonly ITopicService topicService;
 
-    public SpecialityService(IGenericRepository<InternshipSpeciality> specialityRepo)
+    public SpecialityService(IGenericRepository<InternshipSpeciality> specialityRepo, ITopicService topicService)
     {
         this.specialityRepo = specialityRepo;
+        this.topicService = topicService;
     }
 
     public async Task<InternshipSpecialityEditInputModel> GetSpecialityForEditAsync(Guid id)
@@ -118,7 +120,7 @@ public class SpecialityService : ISpecialityService
         return await PaginatedResult<InternshipSpecialityViewModel>.CreateAsync(result, pageNumber, pageSize);
     }
 
-    public async Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id)
+    public async Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id, bool includeDeletedTopics)
     {
         InternshipSpeciality? speciality = await specialityRepo.GetQueryable(asNoTracking: true, ignoreQueryFilters: true)
             .Include(s => s.Topics)
@@ -127,22 +129,16 @@ public class SpecialityService : ISpecialityService
         if (speciality == null)
             throw new ArgumentException("Speciality not found");
 
-        return new InternshipSpecialityDetailsViewModel
+        InternshipSpecialityDetailsViewModel model = new InternshipSpecialityDetailsViewModel()
         {
             Id = speciality.Id,
             Name = speciality.Name,
             Description = speciality.Description,
             IsDeleted = speciality.IsDeleted,
-            Topics = speciality.Topics
-                .OrderBy(t => t.Order)
-                .Select(t => new TopicAdminViewModel
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Order = t.Order,
-                    IsDeleted = t.IsDeleted
-                })
+            Topics = await topicService.GetAllTopicsForSpecialityAsync(id, includeDeletedTopics)
         };
+
+        return model;
     }
 
     public async Task RestoreSpecialityAsync(Guid id)

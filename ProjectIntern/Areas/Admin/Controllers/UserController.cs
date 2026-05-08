@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
 
@@ -27,6 +28,7 @@ public class UserController : BaseAdminController
         try
         {
             int pageSize = 10;
+            if (pageNumber < 1) pageNumber = 1;
             var result = await applicationUserService.GetAllUsersAdminAsync(pageNumber, pageSize, searchTerm, showDeleted);
 
             ViewData["SearchTerm"] = searchTerm;
@@ -42,7 +44,7 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetUserForEdit(Guid id)
+    public async Task<IActionResult> Edit(Guid id)
     {
         try
         {
@@ -68,16 +70,18 @@ public class UserController : BaseAdminController
     {
         if (!ModelState.IsValid)
         {
-            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
-            model.Specialities = refreshedModel.Specialities;
-
-            return View("GetUserForEdit", model);
+            await RefreshSpecialitiesAsync(model);
+            return View("Edit", model);
         }
 
         try
         {
             await applicationUserService.EditUserAsync(model);
             TempData["SuccessMessage"] = "User details updated successfully.";
+
+            if (model.InternshipSpecialityId != null)
+                TempData["WarningMessage"] = "Speciality was changed — curriculum progress has been reset.";
+
             return RedirectToAction(nameof(AllUsers));
         }
         catch (Exception ex)
@@ -85,10 +89,8 @@ public class UserController : BaseAdminController
             logger.LogError(ex, $"Error updating user {model.Id}.");
             TempData["ErrorMessage"] = "Failed to update user details.";
 
-            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
-            model.Specialities = refreshedModel.Specialities;
-
-            return View("GetUserForEdit", model);
+            await RefreshSpecialitiesAsync(model);
+            return View("Edit", model);
         }
     }
 
@@ -126,5 +128,18 @@ public class UserController : BaseAdminController
         }
 
         return RedirectToAction(nameof(AllUsers));
+    }
+
+    private async Task RefreshSpecialitiesAsync(UserEditInputModel model)
+    {
+        try
+        {
+            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
+            model.Specialities = refreshedModel.Specialities;
+        }
+        catch
+        {
+            model.Specialities = new List<SelectListItem>();
+        }
     }
 }

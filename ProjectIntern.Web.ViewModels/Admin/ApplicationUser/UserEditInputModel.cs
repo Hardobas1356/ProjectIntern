@@ -26,10 +26,5 @@ public class UserEditInputModel
     [DataType(DataType.Date)]
     public DateTime? InternshipEndDate { get; set; }
 
-    [Required]
-    [Range(0, int.MaxValue)]
-    [Display(Name = "Last Assignment Order")]
-    public int LastAssignmentOrder { get; set; }
-
     public IEnumerable<SelectListItem> Specialities { get; set; } = new HashSet<SelectListItem>();
 }

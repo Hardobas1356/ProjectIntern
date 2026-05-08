@@ -56,7 +56,29 @@
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0"><i class="fas fa-book me-2"></i>Curriculum Topics</h5>
-            @* Add Topic Button - Passes the SpecialityId *@
+
+            @*Deleted topics switch*@
+            <div class="form-check form-switch">
+                @{
+                    var isIncludeDeleted = Context.Request.Query["includeDeletedTopics"].ToString().ToLower() == "true";
+                }
+                <input class="form-check-input" type="checkbox" role="switch" id="toggleDeleted"
+                @(isIncludeDeleted ? "checked" : "")
+                       onchange="toggleDeletedTopics(this)">
+                <label class="form-check-label" for="toggleDeleted">Include Deleted</label>
+            </div>
+
+            @*Save order*@
+            <div class="d-flex align-items-center gap-2">
+                <button id="save-order-btn" class="btn btn-sm btn-primary d-none" onclick="saveOrder()">
+                    <i class="fas fa-save"></i> Save Order
+                </button>
+                <small id="save-order-hint" class="text-warning d-none">
+                    <i class="fas fa-info-circle"></i> Only affects future assignments
+                </small>
+            </div>
+
+            @* Add Topic Button*@
             <a asp-area="Admin" asp-controller="Topic" asp-action="Create" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-success">
                 <i class="fas fa-plus"></i> Add New Topic
             </a>
@@ -78,7 +100,6 @@
                         {
                             <tr data-id="@topic.Id" class="@(topic.IsDeleted ? "table-light opacity-75" : "grab-handle")">
                                 <td class="ps-4">
-                                    @* Added a handle icon to indicate dragability *@
                                     <i class="fas fa-grip-vertical me-2 text-muted"></i>
                                     <span class="badge bg-secondary"># @topic.Order</span>
                                 </td>
@@ -98,17 +119,17 @@
                                     <div class="d-flex justify-content-center gap-2">
                                         @if (!topic.IsDeleted)
                                         {
-                                            <a asp-controller="Topic" asp-action="Edit" asp-route-id="@topic.Id" class="btn btn-sm btn-warning">
+                                            <a asp-controller="Topic" asp-action="Edit" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" class="btn btn-sm btn-warning">
                                                 Edit <i class="fas fa-edit"></i>
                                             </a>
-                                            <form asp-controller="Topic" asp-action="SoftDelete" asp-route-id="@topic.Id" method="post" onsubmit="return confirm('Delete this topic?');">
+                                            <form asp-controller="Topic" asp-action="SoftDeleteTopic" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" method="post" onsubmit="return confirm('Delete this topic?');">
                                                 @Html.AntiForgeryToken()
                                                 <button type="submit" class="btn btn-sm btn-danger">Delete <i class="fas fa-trash"></i></button>
                                             </form>
                                         }
                                         else
                                         {
-                                            <form asp-controller="Topic" asp-action="Restore" asp-route-id="@topic.Id" method="post">
+                                            <form asp-controller="Topic" asp-action="RestoreTopic" asp-route-topicId="@topic.Id" asp-route-specialityId="@Model.Id" method="post">
                                                 @Html.AntiForgeryToken()
                                                 <button type="submit" class="btn btn-sm btn-success">Restore <i class="fas fa-undo"></i></button>
                                             </form>
@@ -128,59 +149,16 @@
                     }
                 </tbody>
             </table>
+
+            <div id="speciality-data"
+                 data-speciality-id="@Model.Id"
+                 data-reorder-url="@Url.Action("Reorder", "Topic")">
+            </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function ()
-        {
-        var el = document.getElementById('sortable-topics');
-            
-        Sortable.create(el, {
-        animation: 150,
-        handle: '.grab-handle',
-        onEnd: function () {
-        // 1. Instantly update the visual order numbers in the table
-        var rows = el.querySelectorAll('tr[data-id]');
-        var orderedIds = [];
-
-        rows.forEach((row, index) => {
-        // Update the badge text (# 0, # 1, etc)
-        var badge = row.querySelector('.badge.bg-secondary');
-        if (badge) {
-        badge.textContent = '# ' + index;
-        }
-        // Collect the ID for the database update
-        orderedIds.push(row.getAttribute('data-id'));
-        });
-
-        // 2. Build the payload to match the ReorderTopicsRequest DTO
-        var payload = {
-        specialityId: '@Model.Id',
-        topicIds: orderedIds
-        };
-
-        // 3. Post to the Controller
-        fetch('@Url.Action("Reorder", "Topic")', {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-        },
-        body: JSON.stringify(payload)
-        })
-        .then(response => {
-        if (!response.ok) {
-        console.error("Server error during reorder");
-        // alert("Error saving order. Please refresh.");
-        }
-        })
-        .catch(error => console.error('Fetch error:', error));
-        }
-        });
-        });
-    </script>
+    <script src="~/js/speciality-details.js"></script>
 }

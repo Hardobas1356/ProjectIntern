@@ -1,16 +1,17 @@
-﻿namespace InternSolution.Data.Models
-{
-    public class Topic
-    {
-        public Guid Id { get; set; } = Guid.NewGuid();
-        public string Name { get; set; } = null!;
-        public string Description { get; set; } = null!;
-        public int Order { get; set; }
-        public bool IsDeleted { get; set; } = false;
+﻿namespace InternSolution.Data.Models;
 
-        public Guid InternshipSpecialityId { get; set; }
-        public InternshipSpeciality InternshipSpeciality { get; set; } = null!;
-        public virtual ICollection<WorkDayAssignment> WorkDayAssignments { get; set; }
-            = new HashSet<WorkDayAssignment>();
-    }
+public class Topic
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = null!;
+    public string Description { get; set; } = null!;
+    public int Order { get; set; }
+    public bool IsDeleted { get; set; } = false;
+
+    public Guid InternshipSpecialityId { get; set; }
+    public InternshipSpeciality InternshipSpeciality { get; set; } = null!;
+    public virtual ICollection<WorkDayAssignment> WorkDayAssignments { get; set; }
+        = new HashSet<WorkDayAssignment>();
+    public virtual ICollection<ApplicationUser> ApplicationUsers { get; set; }
+    = new HashSet<ApplicationUser>();
 }
