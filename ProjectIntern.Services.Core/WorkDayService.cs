@@ -44,7 +44,7 @@ public class WorkDayService : IWorkDayService
             throw new InvalidOperationException("Intern has completed the curriculum. No new days can be added.");
 
         List<DateTime> sortedDates = dates
-            .Select(d => d.Date)
+            .Select(d => DateTime.SpecifyKind(d.Date, DateTimeKind.Utc))
             .Distinct()
             .OrderBy(d => d)
             .ToList();
@@ -79,7 +79,7 @@ public class WorkDayService : IWorkDayService
 
         List<DateTime> alreadyActiveDates = existingWorkDays
             .Where(w => !w.IsDeleted)
-            .Select(w => w.Date)
+            .Select(w => DateTime.SpecifyKind(w.Date, DateTimeKind.Utc))
             .ToList();
 
         if (alreadyActiveDates.Any())
@@ -114,9 +114,9 @@ public class WorkDayService : IWorkDayService
             WorkDayAssignment newWorkDay = new WorkDayAssignment
             {
                 Id = Guid.NewGuid(),
-                Date = date,
+                Date = DateTime.SpecifyKind(date, DateTimeKind.Utc),
                 InternId = internId,
-                TopicId = nextTopic.Id,
+                TopicId = nextTopic!.Id,
                 CreatedByUserId = adminId,
                 CreatedAt = DateTime.UtcNow,
                 IsDeleted = false,
@@ -150,7 +150,7 @@ public class WorkDayService : IWorkDayService
         ApplicationUser? applicationUser = await CheckUserExistsWithSpecialityIncluded(internId);
 
         List<DateTime> normalizedDates = dates
-            .Select(d => d.Date)
+            .Select(d => DateTime.SpecifyKind(d.Date, DateTimeKind.Utc))
             .Distinct()
             .ToList();
 
@@ -161,7 +161,7 @@ public class WorkDayService : IWorkDayService
 
         List<DateTime> pastDates = workDayAssignmentsToDelete
             .Where(w => w.Date < DateTime.UtcNow.Date)
-            .Select(w => w.Date)
+            .Select(w => DateTime.SpecifyKind(w.Date, DateTimeKind.Utc))
             .ToList();
 
         if (pastDates.Any())
