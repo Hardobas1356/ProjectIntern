@@ -1,6 +1,4 @@
-﻿using ProjectIntern.Web.ViewModels.Admin.WorkDay;
-
-namespace ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
+﻿namespace ProjectIntern.Web.ViewModels.Admin.WorkDay;
 
 public class InternCalendarAdminViewModel
 {

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
-using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
 using ProjectIntern.Web.ViewModels.Admin.WorkDay;
 using ProjectIntern.Web.ViewModels.ApplicationUser;
 using ProjectIntern.Web.ViewModels.WorkDay;

@@ -1,4 +1,4 @@
-﻿using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
+﻿using ProjectIntern.Web.ViewModels.Admin.WorkDay;
 using ProjectIntern.Web.ViewModels.ApplicationUser;
 
 namespace ProjectIntern.Services.Core.Interfaces;
