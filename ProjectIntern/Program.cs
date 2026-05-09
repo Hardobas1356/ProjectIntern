@@ -41,6 +41,9 @@ builder
 builder
     .Services
     .AddScoped<ITopicService, TopicService>();
+builder
+    .Services
+    .AddScoped<IWorkDayService, WorkDayService>();
 
 var app = builder.Build();
 
