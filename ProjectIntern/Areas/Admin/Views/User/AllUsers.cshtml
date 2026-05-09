@@ -126,8 +126,15 @@
                                     </td>
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-1">
+
                                             <a asp-action="Edit" asp-route-id="@user.Id"
                                                class="btn btn-sm btn-outline-warning">Edit</a>
+
+                                            <a asp-area="Admin" asp-controller="WorkDay" asp-action="Calendar" asp-route-internId="@user.Id"
+                                                   class="btn btn-sm btn-outline-info @(user.InternshipSpeciality == "No Speciality (Admin/Unassigned)" ? "disabled" : "")"
+                                                   title="@(user.InternshipSpeciality == "No Speciality (Admin/Unassigned)" ? "No speciality assigned" : "Manage calendar")">
+                                                <i class="fas fa-calendar-alt"></i>
+                                            </a>
 
                                             @if (user.IsDeleted)
                                             {
