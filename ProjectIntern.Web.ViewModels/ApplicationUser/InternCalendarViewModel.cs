@@ -1,6 +1,8 @@
-﻿namespace ProjectIntern.Web.ViewModels.Admin.WorkDay;
+﻿using ProjectIntern.Web.ViewModels.WorkDay;
 
-public class InternCalendarAdminViewModel
+namespace ProjectIntern.Web.ViewModels.ApplicationUser;
+
+public class InternCalendarViewModel
 {
     public Guid InternId { get; set; }
     public string InternName { get; set; } = null!;
@@ -8,5 +10,6 @@ public class InternCalendarAdminViewModel
     public DateTime? InternshipStartDate { get; set; }
     public DateTime? InternshipEndDate { get; set; }
     public bool HasCompletedCurriculum { get; set; }
-    public IEnumerable<WorkDayViewModel> WorkDays { get; set; } = new HashSet<WorkDayViewModel>();
+    public int CompletedTopicsCount { get; set; }
+    public IReadOnlyList<WorkDayViewModel> WorkDays { get; set; } = new List<WorkDayViewModel>();
 }

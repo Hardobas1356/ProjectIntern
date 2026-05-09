@@ -1,9 +1,13 @@
 ﻿using InternSolution.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
+using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
 using ProjectIntern.Web.ViewModels.Admin.WorkDay;
+using ProjectIntern.Web.ViewModels.ApplicationUser;
+using ProjectIntern.Web.ViewModels.WorkDay;
 
 namespace ProjectIntern.Services.Core;
 
@@ -11,17 +15,22 @@ public class WorkDayService : IWorkDayService
 {
     private readonly UserManager<ApplicationUser> userManager;
     private readonly IGenericRepository<WorkDayAssignment> workDayAssignmentRepository;
+    private readonly ILogger<WorkDayService> logger;
 
-    public WorkDayService(UserManager<ApplicationUser> userManager, IGenericRepository<WorkDayAssignment> workDayAssignmentRepository)
+    public WorkDayService(UserManager<ApplicationUser> userManager,
+        IGenericRepository<WorkDayAssignment> workDayAssignmentRepository,
+        ILogger<WorkDayService> logger)
     {
         this.userManager = userManager;
         this.workDayAssignmentRepository = workDayAssignmentRepository;
+        this.logger = logger;
     }
 
     public async Task CreateWorkDayAsync(Guid internId, IEnumerable<DateTime> dates, Guid adminId)
     {
         ApplicationUser applicationUser = await userManager
             .Users
+            .IgnoreQueryFilters()
             .Where(u => u.Id == internId)
             .Include(u => u.InternshipSpeciality)
                 .ThenInclude(s => s!.Topics.Where(t => !t.IsDeleted))
@@ -151,6 +160,18 @@ public class WorkDayService : IWorkDayService
             .Where(w => w.InternId == internId && normalizedDates.Contains(w.Date))
             .ToListAsync();
 
+        List<DateTime> pastDates = workDayAssignmentsToDelete
+            .Where(w => w.Date < DateTime.UtcNow.Date)
+            .Select(w => w.Date)
+            .ToList();
+
+        if (pastDates.Any())
+        {
+            // either warn via return value or just log
+            logger.LogWarning("Admin {AdminId} deleted {Count} past work days for intern {InternId}",
+                adminId, pastDates.Count, internId);
+        }
+
         foreach (var workDayAssignment in workDayAssignmentsToDelete)
         {
             workDayAssignment.IsDeleted = true;
@@ -166,7 +187,7 @@ public class WorkDayService : IWorkDayService
         }
     }
 
-    public async Task<InternCalendarAdminViewModel> GetWorkDaysForInternAsync(Guid internId)
+    public async Task<InternCalendarAdminViewModel> GetWorkDaysForInternAsAdminAsync(Guid internId)
     {
         ApplicationUser? applicationUser = await CheckUserExistsWithSpecialityIncluded(internId);
 
@@ -184,7 +205,7 @@ public class WorkDayService : IWorkDayService
             InternshipStartDate = applicationUser.InternshipStartDate,
             InternshipEndDate = applicationUser.InternshipEndDate,
             HasCompletedCurriculum = applicationUser.HasCompletedCurriculum,
-            WorkDays = await query.Select(w => new WorkDayViewModel
+            WorkDays = await query.Select(w => new WorkDayAdminViewModel
             {
                 Id = w.Id,
                 Date = w.Date,
@@ -194,6 +215,42 @@ public class WorkDayService : IWorkDayService
         };
 
         return result;
+    }
+
+    public async Task<InternCalendarViewModel> GetWorkDaysForInternAsync(Guid internId)
+    {
+        ApplicationUser? applicationUser = await CheckUserExistsWithSpecialityIncluded(internId);
+
+        DateTime today = DateTime.UtcNow.Date;
+
+        IReadOnlyList<WorkDayViewModel> workDays = await workDayAssignmentRepository
+            .GetQueryable()
+            .Where(w => w.InternId == internId)
+            .Include(w => w.Topic)
+            .OrderBy(w => w.Date)
+            .Select(w => new WorkDayViewModel
+            {
+                Id = w.Id,
+                Date = w.Date,
+                IsRevealed = w.Date < today,
+                TopicName = w.Date < today ? w.Topic.Name : null,
+                TopicDescription = w.Date < today ? w.Topic.Description : null,
+            })
+            .ToListAsync();
+
+        int completedTopicsCount = workDays.Count(w => w.IsRevealed);
+
+        return new InternCalendarViewModel
+        {
+            InternId = internId,
+            InternName = applicationUser.Name,
+            SpecialityName = applicationUser.InternshipSpeciality?.Name ?? "N/A",
+            InternshipStartDate = applicationUser.InternshipStartDate,
+            InternshipEndDate = applicationUser.InternshipEndDate,
+            HasCompletedCurriculum = applicationUser.HasCompletedCurriculum,
+            CompletedTopicsCount = completedTopicsCount,
+            WorkDays = workDays
+        };
     }
 
     private async Task<ApplicationUser> CheckUserExistsWithSpecialityIncluded(Guid internId)
