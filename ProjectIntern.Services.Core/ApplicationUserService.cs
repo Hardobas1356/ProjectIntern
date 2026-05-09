@@ -48,6 +48,7 @@ public class ApplicationUserService : IApplicationUserService
         user.InternshipStartDate = model.InternshipStartDate.HasValue
                 ? DateTime.SpecifyKind(model.InternshipStartDate.Value, DateTimeKind.Utc)
                 : null;
+        user.HasCompletedCurriculum = model.HasCompletedCurriculum;
 
         user.InternshipEndDate = model.InternshipEndDate.HasValue
             ? DateTime.SpecifyKind(model.InternshipEndDate.Value, DateTimeKind.Utc)
@@ -66,7 +67,7 @@ public class ApplicationUserService : IApplicationUserService
     {
         IQueryable<ApplicationUser> query = userManager.Users
             .Include(u => u.InternshipSpeciality)
-            .OrderBy(u => u.Name)   
+            .OrderBy(u => u.Name)
             .AsNoTracking()
             .IgnoreQueryFilters();
 
@@ -136,7 +137,7 @@ public class ApplicationUserService : IApplicationUserService
             InternshipSpecialityName = user.InternshipSpeciality?.Name,
             InternshipStartDate = user.InternshipStartDate,
             InternshipEndDate = user.InternshipEndDate,
-
+            HasCompletedCurriculum = user.HasCompletedCurriculum,
             Specialities = specialities.Select(s => new SelectListItem
             {
                 Value = s.Id.ToString(),
