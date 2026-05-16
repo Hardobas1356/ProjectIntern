@@ -2,46 +2,44 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace ProjectIntern.Data.Seeding
+namespace ProjectIntern.Data.Seeding;
+
+public static class DbSeeder
 {
-    public static class DbSeeder
+    public static async Task SeedAdminAsync(IServiceProvider serviceProvider)
     {
-        public static async Task SeedAdminAsync(IServiceProvider serviceProvider)
+        RoleManager<IdentityRole<Guid>> roleManager
+            = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+        UserManager<ApplicationUser> userManager
+            = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        if (!await roleManager.RoleExistsAsync("Admin"))
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
+        }
 
-            // 1. Ensure the Admin Role exists
-            if (!await roleManager.RoleExistsAsync("Admin"))
+        string adminEmail = "admin@test.com";
+        string adminUserName = "Admin";
+        ApplicationUser? existingAdmin = await userManager.FindByEmailAsync(adminEmail);
+
+        if (existingAdmin == null)
+        {
+            ApplicationUser adminUser = new ApplicationUser
             {
-                await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
-            }
+                UserName = adminUserName,
+                Email = adminEmail,
+                Name = "System Admin",
+                EmailConfirmed = true,
+                CreationDate = DateTime.UtcNow,
+                // Note: Specialty and University are null for the Admin
+                InternshipSpecialityId = null
+            };
 
-            // 2. Define the Admin user
-            var adminEmail = "admin@test.com";
-            var existingAdmin = await userManager.FindByEmailAsync(adminEmail);
+            IdentityResult result = await userManager.CreateAsync(adminUser, "Admin123!");
 
-            if (existingAdmin == null)
+            if (result.Succeeded)
             {
-                var adminUser = new ApplicationUser
-                {
-                    UserName = adminEmail,
-                    Email = adminEmail,
-                    Name = "System Admin",
-                    EmailConfirmed = true,
-                    CreationDate = DateTime.UtcNow,
-                    // Note: Specialty and University are null for the Admin
-                    InternshipSpecialityId = null
-                };
-
-                // 3. Create the user with a default password
-                var result = await userManager.CreateAsync(adminUser, "Admin123!");
-
-                if (result.Succeeded)
-                {
-                    // 4. Assign the Admin Role
-                    await userManager.AddToRoleAsync(adminUser, "Admin");
-                }
+                await userManager.AddToRoleAsync(adminUser, "Admin");
             }
         }
     }
