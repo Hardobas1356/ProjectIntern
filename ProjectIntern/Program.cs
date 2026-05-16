@@ -25,13 +25,18 @@ builder.Services
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
 builder.Services
     .AddControllersWithViews();
 
 builder
     .Services
     .AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
 builder
     .Services
     .AddScoped<IApplicationUserService, ApplicationUserService>();
@@ -72,7 +77,7 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Calendar}/{action=Index}/{id?}")
     .WithStaticAssets();
 
 app.MapRazorPages()
