@@ -23,6 +23,10 @@ public class ApplicationUserService : IApplicationUserService
         this.internSpecialityRepo = internSpecialityRepo ?? throw new ArgumentNullException(nameof(internSpecialityRepo));
     }
 
+
+    //Todo add option to change last assigned topic
+    //and completed curriculum status when changing speciality
+    //or at least reset them to default values
     public async Task EditUserAsync(UserEditInputModel model)
     {
         ApplicationUser? user = await userManager.Users

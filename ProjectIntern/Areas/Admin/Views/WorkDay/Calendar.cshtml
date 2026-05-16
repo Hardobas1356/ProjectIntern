@@ -1,5 +1,4 @@
-﻿
-@model ProjectIntern.Web.ViewModels.Admin.WorkDay.InternCalendarAdminViewModel
+﻿@model ProjectIntern.Web.ViewModels.Admin.WorkDay.InternCalendarAdminViewModel
 
 @{
     ViewData["Title"] = $"Calendar – {Model.InternName}";
@@ -12,142 +11,251 @@
 }
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
 <style>
-    .calendar-page { background: #0f1117; min-height: 100vh; color: #e8e6df; font-family: 'DM Sans', sans-serif; }
+    .calendar-page {
+        background: #f8f9fa;
+        min-height: 100vh;
+        color: #2d3142;
+        font-family: 'DM Sans', sans-serif;
+    }
 
-    .intern-header {
-        background: linear-gradient(135deg, #1a1d27 0%, #12151e 100%);
-        border-bottom: 1px solid #2a2d3a;
-        padding: 1.5rem 2rem;
+    .calendar-wrapper-panel {
+        display: block;
+        width: 100%;
+        max-width: 340px;
+        margin: 0 auto;
+    }
+
+    .calendar-page .panel .py-3 {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+
+    .flatpickr-calendar.inline {
+        height: auto !important;
+    }
+
+    .intern-header .btn-secondary-outline {
+        background: transparent;
+        color: #5a5e78;
+        border: 1px solid #e2e4f0;
+        border-radius: 0.625rem;
+        padding: 0.625rem 1.25rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        transition: all 0.15s ease;
     }
 
     .intern-badge {
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: #1e2235;
-        border: 1px solid #2e3350;
+        background: #eef2ff;
+        border: 1px solid #cdd5f3;
         border-radius: 2rem;
         padding: 0.25rem 0.875rem;
         font-size: 0.78rem;
-        color: #7b8cde;
+        color: #3d4fd6;
         font-weight: 500;
         letter-spacing: 0.04em;
         text-transform: uppercase;
     }
 
-    .intern-name { font-size: 1.6rem; font-weight: 700; color: #f0ede6; margin: 0.25rem 0 0; letter-spacing: -0.02em; }
+    .intern-name {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #1a1d27;
+        margin: 0.25rem 0 0;
+        letter-spacing: -0.02em;
+    }
 
     .stat-chip {
-        background: #161922;
-        border: 1px solid #252837;
+        background: #ffffff;
+        border: 1px solid #e2e4f0;
         border-radius: 0.75rem;
         padding: 0.625rem 1rem;
         font-size: 0.8rem;
-        color: #8b8fa8;
+        color: #6b6f85;
     }
 
-    .stat-chip strong { color: #e8e6df; font-size: 1rem; display: block; }
+        .stat-chip strong {
+            color: #1a1d27;
+            font-size: 1rem;
+            display: block;
+        }
 
     .panel {
-        background: #161922;
-        border: 1px solid #252837;
+        background: #ffffff;
+        border: 1px solid #e2e4f0;
         border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
     .panel-header {
         padding: 1rem 1.25rem;
-        border-bottom: 1px solid #252837;
+        border-bottom: 1px solid #e2e4f0;
         font-size: 0.78rem;
         font-weight: 600;
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        color: #6b6f85;
+        color: #8b8fa8;
     }
 
-    /* Flatpickr overrides */
+    /* --- FIXED FLATPICKR LAYOUT RULES --- */
     .flatpickr-calendar {
-        background: #161922 !important;
-        border: 1px solid #252837 !important;
-        border-radius: 1rem !important;
-        box-shadow: 0 24px 64px rgba(0,0,0,0.5) !important;
-        width: 100% !important;
+        background: #ffffff !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        width: 307.875px !important; /* Set native default block container width */
+        margin: 0 auto;
         font-family: 'DM Sans', sans-serif !important;
     }
 
-    .flatpickr-months { padding: 0.75rem 0.5rem 0; }
-    .flatpickr-month { color: #e8e6df !important; }
-    .flatpickr-current-month { font-size: 1rem !important; font-weight: 600 !important; color: #e8e6df !important; }
-    .flatpickr-monthDropdown-months { background: #1e2235 !important; color: #e8e6df !important; }
-    .numInputWrapper span { border-color: #2a2d3a !important; }
-    .numInputWrapper span svg path { fill: #6b6f85 !important; }
-    .flatpickr-prev-month, .flatpickr-next-month { color: #6b6f85 !important; fill: #6b6f85 !important; }
-    .flatpickr-prev-month:hover, .flatpickr-next-month:hover { color: #e8e6df !important; fill: #e8e6df !important; }
+    .flatpickr-months {
+        padding: 0.75rem 0.5rem 0;
+    }
 
-    .flatpickr-weekdays { background: transparent !important; border-bottom: 1px solid #252837; padding-bottom: 0.5rem; }
-    .flatpickr-weekday { color: #4a4e62 !important; font-weight: 600 !important; font-size: 0.72rem !important; letter-spacing: 0.06em !important; }
+    .flatpickr-month {
+        color: #1a1d27 !important;
+    }
 
-    .flatpickr-days { padding: 0.5rem; }
+    .flatpickr-current-month {
+        font-size: 1rem !important;
+        font-weight: 600 !important;
+        color: #1a1d27 !important;
+    }
+
+    .flatpickr-monthDropdown-months {
+        background: #f4f5fb !important;
+        color: #1a1d27 !important;
+    }
+
+    .numInputWrapper span {
+        border-color: #d0d2e0 !important;
+    }
+
+        .numInputWrapper span svg path {
+            fill: #9b9fb8 !important;
+        }
+
+    .flatpickr-prev-month, .flatpickr-next-month {
+        color: #9b9fb8 !important;
+        fill: #9b9fb8 !important;
+    }
+
+        .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+            color: #1a1d27 !important;
+            fill: #1a1d27 !important;
+        }
+
+    .flatpickr-weekdays {
+        background: transparent !important;
+        border-bottom: 1px solid #e8eaf0;
+        padding-bottom: 0.5rem;
+    }
+
+    .flatpickr-weekday {
+        color: #b0b3c8 !important;
+        font-weight: 600 !important;
+        font-size: 0.72rem !important;
+        letter-spacing: 0.06em !important;
+    }
+
+    .flatpickr-days {
+        padding: 0.5rem 0 0 0;
+        width: 307.875px !important;
+    }
+
+    .dayContainer {
+        width: 296.875px !important;
+        min-width: 296.875px !important;
+        max-width: 296.875px !important;
+    }
+
     .flatpickr-day {
-        color: #8b8fa8 !important;
+        color: #3a3d52 !important;
         border-radius: 0.5rem !important;
         font-size: 0.85rem !important;
-        height: 36px !important;
-        line-height: 36px !important;
+        height: 38px !important;
+        line-height: 38px !important;
+        max-width: 38px !important;
+        margin-top: 2px !important;
         transition: all 0.12s ease !important;
     }
 
-    .flatpickr-day:hover { background: #1e2235 !important; color: #e8e6df !important; border-color: transparent !important; }
-    .flatpickr-day.today { border-color: #4a5080 !important; color: #a0a8e0 !important; }
-    .flatpickr-day.today:hover { background: #1e2235 !important; }
+        .flatpickr-day:hover {
+            background: #f0f2ff !important;
+            color: #1a1d27 !important;
+            border-color: transparent !important;
+        }
 
-    .flatpickr-day.selected, .flatpickr-day.selected:hover {
-        background: #3d4fd6 !important;
-        border-color: #3d4fd6 !important;
-        color: #fff !important;
-        font-weight: 600 !important;
-    }
+        .flatpickr-day.today {
+            border-color: #c0c8f0 !important;
+            color: #3d4fd6 !important;
+        }
 
-    .flatpickr-day.flatpickr-disabled { color: #2e3145 !important; }
-    .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay { color: #2e3145 !important; }
+            .flatpickr-day.today:hover {
+                background: #f0f2ff !important;
+            }
+
+        .flatpickr-day.selected, .flatpickr-day.selected:hover {
+            background: #3d4fd6 !important;
+            border-color: #3d4fd6 !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+        }
+
+        .flatpickr-day.flatpickr-disabled {
+            color: #e2e4f0 !important;
+        }
+
+        .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
+            color: #b0b3c8 !important;
+        }
 
     /* Topic preview panel */
     .topic-preview {
         transition: all 0.2s ease;
     }
 
-    .topic-preview.empty {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 180px;
-        color: #3a3d52;
-    }
+        .topic-preview.empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+            color: #b0b3c8;
+        }
 
-    .topic-preview .topic-date {
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #5a5e78;
-        margin-bottom: 0.5rem;
-    }
+        .topic-preview .topic-date {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #8b8fa8;
+            margin-bottom: 0.5rem;
+        }
 
-    .topic-preview .topic-name {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #f0ede6;
-        margin-bottom: 0.625rem;
-        line-height: 1.3;
-    }
+        .topic-preview .topic-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #1a1d27;
+            margin-bottom: 0.625rem;
+            line-height: 1.3;
+        }
 
-    .topic-preview .topic-desc {
-        font-size: 0.85rem;
-        color: #7b7f99;
-        line-height: 1.65;
-    }
+        .topic-preview .topic-desc {
+            font-size: 0.85rem;
+            color: #5a5e78;
+            line-height: 1.65;
+        }
 
     /* Action buttons */
     .btn-add {
@@ -165,13 +273,21 @@
         gap: 0.4rem;
     }
 
-    .btn-add:hover { background: #4a5ce0; transform: translateY(-1px); }
-    .btn-add:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-add:hover {
+            background: #2a3bc2;
+            transform: translateY(-1px);
+        }
+
+        .btn-add:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
 
     .btn-remove {
         background: transparent;
         color: #c0394a;
-        border: 1px solid #3a1a20;
+        border: 1px solid #f3d1d5;
         border-radius: 0.625rem;
         padding: 0.625rem 1.25rem;
         font-size: 0.85rem;
@@ -183,60 +299,81 @@
         gap: 0.4rem;
     }
 
-    .btn-remove:hover { background: #2a0f15; border-color: #c0394a; transform: translateY(-1px); }
-    .btn-remove:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-remove:hover {
+            background: #fff5f6;
+            border-color: #c0394a;
+            transform: translateY(-1px);
+        }
+
+        .btn-remove:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
 
     .btn-secondary-outline {
         background: transparent;
-        color: #6b6f85;
-        border: 1px solid #252837;
+        color: #1a1d27;
+        border-color: #b0b3c8;
         border-radius: 0.625rem;
-        padding: 0.625rem 1.25rem;
+        padding: 0.5rem 0.8rem;
         font-size: 0.85rem;
-        font-weight: 500;
-        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s ease;
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        transition: all 0.15s ease;
     }
 
-    .btn-secondary-outline:hover { color: #e8e6df; border-color: #3a3d52; }
+    .btn-secondary-outline:hover {
+        background: #fff5f6;
+        border-color: #c0394a;
+        transform: translateY(-1px);
+    }
 
     /* Selection summary */
     .selection-summary {
-        background: #1a1d2b;
-        border: 1px solid #2a2d3a;
+        background: #f4f5fb;
+        border: 1px solid #e2e4f0;
         border-radius: 0.75rem;
         padding: 0.75rem 1rem;
         font-size: 0.82rem;
-        color: #6b6f85;
+        color: #5a5e78;
         min-height: 2.5rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    .selection-summary .count-badge {
-        background: #3d4fd6;
-        color: #fff;
-        border-radius: 1rem;
-        padding: 0.1rem 0.5rem;
-        font-weight: 700;
-        font-size: 0.78rem;
+        .selection-summary .count-badge {
+            background: #3d4fd6;
+            color: #fff;
+            border-radius: 1rem;
+            padding: 0.1rem 0.5rem;
+            font-weight: 700;
+            font-size: 0.78rem;
+        }
+
+    /* Toast alerts */
+    .toast-container {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
-    /* Toast */
-    .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; }
-
     .toast-msg {
-        background: #1e2235;
-        border: 1px solid #2e3350;
+        background: #ffffff;
+        border: 1px solid #e2e4f0;
         border-radius: 0.75rem;
         padding: 0.75rem 1.125rem;
         font-size: 0.85rem;
-        color: #e8e6df;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        color: #2d3142;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
         display: flex;
         align-items: center;
         gap: 0.625rem;
@@ -244,11 +381,29 @@
         max-width: 320px;
     }
 
-    .toast-msg.success { border-left: 3px solid #3dbe7a; }
-    .toast-msg.error { border-left: 3px solid #c0394a; }
-    .toast-msg.warning { border-left: 3px solid #e0963a; }
+        .toast-msg.success {
+            border-left: 4px solid #3dbe7a;
+        }
 
-    @@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .toast-msg.error {
+            border-left: 4px solid #c0394a;
+        }
+
+        .toast-msg.warning {
+            border-left: 4px solid #e0963a;
+        }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
 
     /* Work day list */
     .day-row {
@@ -256,29 +411,47 @@
         align-items: center;
         justify-content: space-between;
         padding: 0.625rem 1.25rem;
-        border-bottom: 1px solid #1e2130;
+        border-bottom: 1px solid #f0f2ff;
         transition: background 0.12s ease;
         cursor: pointer;
     }
 
-    .day-row:last-child { border-bottom: none; }
-    .day-row:hover { background: #1a1d2b; }
-    .day-row.active { background: #1e2235; }
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+        .day-row:hover {
+            background: #f8f9fa;
+        }
+
+        .day-row.active {
+            background: #f0f2ff;
+        }
 
     .day-dot {
-        width: 8px; height: 8px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
         background: #3d4fd6;
         flex-shrink: 0;
     }
 
-    .day-label { font-size: 0.85rem; color: #c0c2d4; font-weight: 500; }
-    .day-topic { font-size: 0.75rem; color: #5a5e78; margin-top: 0.1rem; }
+    .day-label {
+        font-size: 0.85rem;
+        color: #2d3142;
+        font-weight: 500;
+    }
+
+    .day-topic {
+        font-size: 0.75rem;
+        color: #6b6f85;
+        margin-top: 0.1rem;
+    }
 
     .completed-pill {
-        background: #0f2a1a;
-        color: #3dbe7a;
-        border: 1px solid #1a4a2a;
+        background: #e6f8ee;
+        color: #1e7e44;
+        border: 1px solid #c3edd5;
         border-radius: 1rem;
         padding: 0.125rem 0.625rem;
         font-size: 0.72rem;
@@ -286,144 +459,144 @@
     }
 </style>
 
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-<div class="calendar-page">
-
-    @* Header *@
-    <div class="intern-header">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-            <div>
-                <nav aria-label="breadcrumb" class="mb-2">
-                    <ol class="breadcrumb mb-0" style="font-size:0.78rem; --bs-breadcrumb-divider-color:#3a3d52; color:#5a5e78;">
-                        <li class="breadcrumb-item"><a asp-controller="User" asp-action="AllUsers" style="color:#5a5e78; text-decoration:none;">Users</a></li>
-                        <li class="breadcrumb-item active" style="color:#3a3d52;">Calendar</li>
-                    </ol>
-                </nav>
-                <div class="intern-badge mb-2">
-                    <i class="fas fa-circle" style="font-size:0.45rem; color:#3d4fd6;"></i>
-                    @Model.SpecialityName
-                </div>
-                <h1 class="intern-name">@Model.InternName</h1>
-            </div>
-            <div class="d-flex gap-2 align-items-center flex-wrap">
-                <div class="stat-chip">
-                    <strong>@Model.WorkDays.Count()</strong>
-                    Work days
-                </div>
-                @if (Model.InternshipStartDate.HasValue)
-                {
-                    <div class="stat-chip">
-                        <strong>@Model.InternshipStartDate.Value.ToString("dd MMM yyyy")</strong>
-                        Start date
+<div class="calendar-page pt-5">
+    <div class="container-fluid px-4">
+        
+        @* Header *@
+        <div class="intern-header mb-2">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div>
+                    <nav aria-label="breadcrumb" class="mb-2">
+                        <ol class="breadcrumb mb-0" style="font-size:0.78rem; --bs-breadcrumb-divider-color:#3a3d52; color:#5a5e78;">
+                            <li class="breadcrumb-item"><a asp-controller="User" asp-action="AllUsers" style="color:#5a5e78; text-decoration:none;">Users</a></li>
+                            <li class="breadcrumb-item active" style="color:#3a3d52;">Calendar</li>
+                        </ol>
+                    </nav>
+                    <div class="intern-badge mb-2">
+                        <i class="fas fa-circle" style="font-size:0.45rem; color:#3d4fd6;"></i>
+                        @Model.SpecialityName
                     </div>
-                }
-                @if (Model.InternshipEndDate.HasValue)
-                {
+                    <h1 class="intern-name">@Model.InternName</h1>
+                </div>
+                <div class="d-flex gap-2 align-items-center flex-wrap">
                     <div class="stat-chip">
-                        <strong>@Model.InternshipEndDate.Value.ToString("dd MMM yyyy")</strong>
-                        End date
+                        <strong>@Model.WorkDays.Count()</strong>
+                        Work days
                     </div>
-                }
-                @if (Model.HasCompletedCurriculum)
-                {
-                    <span class="completed-pill"><i class="fas fa-check me-1"></i>Curriculum complete</span>
-                }
-                <a asp-controller="User" asp-action="AllUsers" class="btn-secondary-outline">
-                    <i class="fas fa-arrow-left"></i> Back
-                </a>
+                    @if (Model.InternshipStartDate.HasValue)
+                    {
+                        <div class="stat-chip">
+                            <strong>@Model.InternshipStartDate.Value.ToString("dd MMM yyyy")</strong>
+                            Start date
+                        </div>
+                    }
+                    @if (Model.InternshipEndDate.HasValue)
+                    {
+                        <div class="stat-chip">
+                            <strong>@Model.InternshipEndDate.Value.ToString("dd MMM yyyy")</strong>
+                            End date
+                        </div>
+                    }
+                    @if (Model.HasCompletedCurriculum)
+                    {
+                        <span class="completed-pill"><i class="fas fa-check me-1"></i>Curriculum complete</span>
+                    }
+                    <a asp-controller="User" asp-action="AllUsers" class="btn-secondary-outline">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    @* Main layout *@
-    <div class="container-fluid px-4 py-4">
-        <div class="row g-4">
+        @* Main layout *@
+        <div class="py-4">
+            <div class="row g-4">
 
-            @* Left — Calendar + Actions *@
-            <div class="col-xl-5 col-lg-6">
+                @* Left — Calendar + Actions *@
+                <div class="col-xl-5 col-lg-6 d-flex flex-column align-items-center">
 
-                @* Flatpickr inline calendar *@
-                <div class="panel mb-3">
-                    <div class="panel-header d-flex justify-content-between align-items-center">
-                        <span><i class="fas fa-calendar-alt me-2"></i>Select days</span>
-                        <span style="font-size:0.72rem; color:#3a3d52; text-transform:none; letter-spacing:0;">Click to select · Click again to deselect</span>
-                    </div>
-                    <div style="padding: 0.75rem;">
-                        <input id="calendar-input" type="text" style="display:none;" />
-                    </div>
-                </div>
-
-                @* Selection summary *@
-                <div class="selection-summary mb-3" id="selection-summary">
-                    <i class="fas fa-hand-pointer" style="color:#3a3d52;"></i>
-                    <span id="summary-text">No dates selected</span>
-                </div>
-
-                @* Action buttons *@
-                <div class="d-flex gap-2 flex-wrap">
-                    <button class="btn-add" id="btn-add" onclick="addDays()" disabled>
-                        <i class="fas fa-plus"></i> Add days
-                    </button>
-                    <button class="btn-remove" id="btn-remove" onclick="removeDays()" disabled>
-                        <i class="fas fa-minus"></i> Remove days
-                    </button>
-                    <button class="btn-secondary-outline" onclick="clearSelection()" style="cursor:pointer; background:transparent;">
-                        <i class="fas fa-times"></i> Clear
-                    </button>
-                </div>
-            </div>
-
-            @* Right — Topic preview + Work day list *@
-            <div class="col-xl-7 col-lg-6">
-                <div class="row g-3">
-
-                    @* Topic preview *@
-                    <div class="col-12">
-                        <div class="panel">
-                            <div class="panel-header"><i class="fas fa-book-open me-2"></i>Topic preview</div>
-                            <div class="p-3 topic-preview empty" id="topic-preview">
-                                <i class="fas fa-mouse-pointer mb-2" style="font-size:1.5rem;"></i>
-                                <span style="font-size:0.85rem;">Click a highlighted day to preview its topic</span>
-                            </div>
+                    @* Flatpickr inline calendar *@
+                    <div class="panel mb-3 calendar-wrapper-panel">
+                        <div class="panel-header d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-calendar-alt me-2"></i>Select days</span>
+                            <span style="font-size:0.72rem; color:#8b8fa8; text-transform:none; letter-spacing:0;">Click to select</span>
+                        </div>
+                        <div class="d-flex justify-content-center py-2">
+                            <input id="calendar-input" type="text" style="display:none;" />
                         </div>
                     </div>
 
-                    @* Work day list *@
-                    <div class="col-12">
-                        <div class="panel">
-                            <div class="panel-header d-flex justify-content-between">
-                                <span><i class="fas fa-list me-2"></i>Assigned work days</span>
-                                <span id="day-count-label" style="color:#3d4fd6; font-size:0.78rem; text-transform:none; letter-spacing:0;">@Model.WorkDays.Count() days</span>
+                    @* Selection summary — Centered and constrained *@
+                    <div class="selection-summary mb-3 w-100" id="selection-summary" style="max-width: 340px;">
+                        <i class="fas fa-hand-pointer" style="color:#5a5e78;"></i>
+                        <span id="summary-text">No dates selected</span>
+                    </div>
+
+                    @* Action buttons — Centered, constrained, and justified *@
+                    <div class="d-flex justify-content-center gap-2 flex-wrap w-100" style="max-width: 340px;">
+                        <button class="btn-add" id="btn-add" onclick="addDays()" disabled>
+                            Add days
+                        </button>
+                        <button class="btn-remove" id="btn-remove" onclick="removeDays()" disabled>
+                            Remove days
+                        </button>
+                        <button class="btn-secondary-outline" onclick="clearSelection()">
+                        Clear
+                        </button>
+                    </div>
+                </div>
+
+                @* Right — Topic preview + Work day list *@
+                <div class="col-xl-7 col-lg-6">
+                    <div class="row g-3">
+
+                        @* Topic preview *@
+                        <div class="col-12">
+                            <div class="panel">
+                                <div class="panel-header"><i class="fas fa-book-open me-2"></i>Topic preview</div>
+                                <div class="p-3 topic-preview empty" id="topic-preview">
+                                    <i class="fas fa-mouse-pointer mb-2" style="font-size:1.5rem;"></i>
+                                    <span style="font-size:0.85rem;">Click a highlighted day to preview its topic</span>
+                                </div>
                             </div>
-                            <div id="work-days-list" style="max-height: 380px; overflow-y: auto;">
-                                @if (Model.WorkDays.Any())
-                                {
-                                    foreach (var day in Model.WorkDays.OrderBy(d => d.Date))
+                        </div>
+
+                        @* Work day list *@
+                        <div class="col-12">
+                            <div class="panel">
+                                <div class="panel-header d-flex justify-content-between">
+                                    <span><i class="fas fa-list me-2"></i>Assigned work days</span>
+                                    <span id="day-count-label" style="color:#3d4fd6; font-size:0.78rem; text-transform:none; letter-spacing:0;">@Model.WorkDays.Count() days</span>
+                                </div>
+                                <div id="work-days-list" style="max-height: 380px; overflow-y: auto;">
+                                    @if (Model.WorkDays.Any())
                                     {
-                                        <div class="day-row" data-date="@day.Date.ToString("yyyy-MM-dd")" onclick="previewDay('@day.Date.ToString("yyyy-MM-dd")')">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="day-dot"></div>
-                                                <div>
-                                                    <div class="day-label">@day.Date.ToString("dddd, dd MMM yyyy")</div>
-                                                    <div class="day-topic">@day.TopicName</div>
+                                        foreach (var day in Model.WorkDays.OrderBy(d => d.Date))
+                                        {
+                                            <div class="day-row" data-date="@day.Date.ToString("yyyy-MM-dd")" onclick="previewDay('@day.Date.ToString("yyyy-MM-dd")')">
+                                                <div class="d-flex align-items-center gap-3">
+                                                    <div class="day-dot"></div>
+                                                    <div>
+                                                        <div class="day-label">@day.Date.ToString("dddd, dd MMM yyyy")</div>
+                                                        <div class="day-topic">@day.TopicName</div>
+                                                    </div>
                                                 </div>
+                                                <i class="fas fa-chevron-right" style="color:#8b8fa8; font-size:0.72rem;"></i>
                                             </div>
-                                            <i class="fas fa-chevron-right" style="color:#2e3145; font-size:0.72rem;"></i>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div class="py-5 text-center" style="color:#b0b3c8; font-size:0.85rem;" id="empty-list-msg">
+                                            <i class="fas fa-calendar-times mb-2 d-block" style="font-size:1.5rem;"></i>
+                                            No work days assigned yet
                                         </div>
                                     }
-                                }
-                                else
-                                {
-                                    <div class="py-5 text-center" style="color:#3a3d52; font-size:0.85rem;" id="empty-list-msg">
-                                        <i class="fas fa-calendar-times mb-2 d-block" style="font-size:1.5rem;"></i>
-                                        No work days assigned yet
-                                    </div>
-                                }
+                                </div>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
             </div>
         </div>
@@ -480,8 +653,9 @@
         onDayCreate: function(dObj, dStr, fp, dayElem) {
         const dateStr = formatDate(dayElem.dateObj);
         if (existingDates.includes(dateStr)) {
-        dayElem.style.background = '#1e2d4a';
-        dayElem.style.color = '#7ba8e0';
+        // Refactored day element backgrounds match the light theme color rules cleanly
+        dayElem.style.background = '#eef2ff';
+        dayElem.style.color = '#3d4fd6';
         dayElem.style.borderRadius = '0.5rem';
         }
         }
@@ -503,8 +677,8 @@
         const existing = selectedDates.filter(d => existingDates.includes(d));
         const newDates = selectedDates.filter(d => !existingDates.includes(d));
         let parts = [];
-        if (newDates.length) parts.push(`<span style="color:#7ba8e0;">${newDates.length} new</span>`);
-        if (existing.length) parts.push(`<span style="color:#c0394a;">${existing.length} to remove</span>`);
+        if (newDates.length) parts.push(`<span style="color:#3d4fd6; font-weight:600;">${newDates.length} new</span>`);
+        if (existing.length) parts.push(`<span style="color:#c0394a; font-weight:600;">${existing.length} to remove</span>`);
         summaryEl.innerHTML = `${countBadge} ${parts.join(' · ')} selected`;
         }
         }
@@ -532,7 +706,7 @@
         const data = workDayMap[dateStr];
 
         if (!data) {
-        preview.innerHTML = `<div style="color:#3a3d52; font-size:0.85rem; text-align:center;">No data for this day</div>`;
+        preview.innerHTML = `<div style="color:#8b8fa8; font-size:0.85rem; text-align:center;">No data for this day</div>`;
         preview.classList.add('empty');
         return;
         }
@@ -543,8 +717,8 @@
 
         preview.innerHTML = `
         <div class="topic-date">${formatted}</div>
-        <div class="topic-name">${data.topicName ?? ''}</div>
-        <div class="topic-desc">${data.topicDescription ?? ''}</div>
+        <div class="topic-name">${data.TopicName ?? ''}</div>
+        <div class="topic-desc">${data.TopicDescription ?? ''}</div>
         `;
         }
 
@@ -641,7 +815,6 @@
         setTimeout(() => el.remove(), 4000);
         }
 
-        // Antiforgery token — ensure it exists for fetch calls
         (function ensureToken() {
         if (!document.querySelector('input[name="__RequestVerificationToken"]')) {
         const form = document.createElement('form');
