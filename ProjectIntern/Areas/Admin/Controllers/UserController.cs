@@ -17,13 +17,7 @@ public class UserController : BaseAdminController
     }
 
     [HttpGet]
-    public IActionResult Index()
-    {
-        return View();
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> AllUsers(string? searchTerm, bool showDeleted, int pageNumber = 1)
+    public async Task<IActionResult> Index(string? searchTerm, bool showDeleted, int pageNumber = 1)
     {
         try
         {
@@ -54,13 +48,13 @@ public class UserController : BaseAdminController
         catch (KeyNotFoundException)
         {
             TempData["ErrorMessage"] = "User not found.";
-            return RedirectToAction(nameof(AllUsers));
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Error fetching user {id} for edit.");
             TempData["ErrorMessage"] = "An error occurred while loading the user data.";
-            return RedirectToAction(nameof(AllUsers));
+            return RedirectToAction(nameof(Index));
         }
     }
 
@@ -82,7 +76,7 @@ public class UserController : BaseAdminController
             if (model.InternshipSpecialityId != null)
                 TempData["WarningMessage"] = "Speciality was changed — curriculum progress has been reset.";
 
-            return RedirectToAction(nameof(AllUsers));
+            return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)
         {
@@ -109,7 +103,7 @@ public class UserController : BaseAdminController
             TempData["ErrorMessage"] = "Failed to delete the user.";
         }
 
-        return RedirectToAction(nameof(AllUsers));
+        return RedirectToAction(nameof(Index));
     }
 
     [HttpPost]
@@ -127,7 +121,7 @@ public class UserController : BaseAdminController
             TempData["ErrorMessage"] = "Failed to restore the user.";
         }
 
-        return RedirectToAction(nameof(AllUsers));
+        return RedirectToAction(nameof(Index));
     }
 
     private async Task RefreshSpecialitiesAsync(UserEditInputModel model)
