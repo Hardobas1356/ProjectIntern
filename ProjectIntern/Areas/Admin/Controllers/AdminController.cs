@@ -1,6 +1,11 @@
-﻿namespace ProjectIntern.Areas.Admin.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace ProjectIntern.Areas.Admin.Controllers;
+
+public class AdminController : BaseAdminController
 {
-    public class AdminController
+    public IActionResult Index()
     {
+        return View();
     }
 }
