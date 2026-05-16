@@ -1,0 +1,284 @@
+﻿@using ProjectIntern.Web.ViewModels.ApplicationUser   
+@model InternCalendarViewModel
+
+@{
+    ViewData["Title"] = "My Calendar";
+
+    var revealedDates = Model.WorkDays
+        .Where(w => w.IsRevealed)
+        .Select(w => w.Date.ToString("yyyy-MM-dd"))
+        .ToList();
+
+    var upcomingDates = Model.WorkDays
+        .Where(w => !w.IsRevealed)
+        .Select(w => w.Date.ToString("yyyy-MM-dd"))
+        .ToList();
+
+    var revealedMap = Model.WorkDays
+        .Where(w => w.IsRevealed)
+        .ToDictionary(
+            w => w.Date.ToString("yyyy-MM-dd"),
+            w => new { w.TopicName, w.TopicDescription }
+        );
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+<link rel="stylesheet" href="~/css/intern-calendar.css" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+<div class="intern-calendar-page">
+
+    @* Header *@
+    <div class="ic-header">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+            <div>
+                <div class="ic-badge mb-2">
+                    <i class="fas fa-circle" style="font-size:0.45rem; color:#3d4fd6;"></i>
+                    @Model.SpecialityName
+                </div>
+                <h1 class="ic-name">My Internship Calendar</h1>
+                <p class="ic-sub">@Model.InternName</p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <div class="ic-stat">
+                    <strong>@Model.WorkDays.Count()</strong>
+                    Total days
+                </div>
+                <div class="ic-stat">
+                    <strong>@Model.CompletedTopicsCount</strong>
+                    Topics covered
+                </div>
+                @if (Model.InternshipStartDate.HasValue)
+                {
+                    <div class="ic-stat">
+                        <strong>@Model.InternshipStartDate.Value.ToString("dd MMM yyyy")</strong>
+                        Start
+                    </div>
+                }
+                @if (Model.InternshipEndDate.HasValue)
+                {
+                    <div class="ic-stat">
+                        <strong>@Model.InternshipEndDate.Value.ToString("dd MMM yyyy")</strong>
+                        End
+                    </div>
+                }
+                @if (Model.HasCompletedCurriculum)
+                {
+                    <span class="ic-complete-pill">
+                        <i class="fas fa-check me-1"></i> Curriculum complete
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid px-4 py-4">
+        <div class="row g-4">
+
+            @* Left — read-only calendar *@
+            <div class="col-xl-5 col-lg-6">
+                <div class="ic-panel mb-3">
+                    <div class="ic-panel-header">
+                        <i class="fas fa-calendar-alt me-2"></i>Your schedule
+                        <span class="ic-legend">
+                            <span class="ic-legend-dot revealed"></span> Covered
+                            <span class="ic-legend-dot upcoming"></span> Upcoming
+                        </span>
+                    </div>
+                    <div style="padding: 0.75rem;">
+                        <input id="calendar-input" type="text" style="display:none;" />
+                    </div>
+                </div>
+
+                @* Progress bar *@
+                @if (Model.WorkDays.Any())
+                {
+                    int pct = (int)Math.Round((double)Model.CompletedTopicsCount / Model.WorkDays.Count() * 100);
+                    <div class="ic-panel p-3 mb-3">
+                        <div class="d-flex justify-content-between mb-2" style="font-size:0.8rem; color:#8b8fa8;">
+                            <span>Progress</span>
+                            <span style="color:#e8e6df; font-weight:600;">@Model.CompletedTopicsCount / @Model.WorkDays.Count() days</span>
+                        </div>
+                        <div class="ic-progress-track">
+                            <div class="ic-progress-fill" style="width: @pct%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            @* Right — topic detail + upcoming list *@
+            <div class="col-xl-7 col-lg-6">
+                <div class="row g-3">
+
+                    @* Topic preview *@
+                    <div class="col-12">
+                        <div class="ic-panel">
+                            <div class="ic-panel-header"><i class="fas fa-book-open me-2"></i>Topic detail</div>
+                            <div class="ic-topic-preview empty" id="topic-preview">
+                                <i class="fas fa-hand-pointer mb-2" style="font-size:1.4rem;"></i>
+                                <span>Click a day on the calendar to see its topic</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Upcoming days *@
+                    <div class="col-12">
+                        <div class="ic-panel">
+                            <div class="ic-panel-header d-flex justify-content-between">
+                                <span><i class="fas fa-clock me-2"></i>Upcoming days</span>
+                                <span style="color:#3d4fd6; font-size:0.78rem; text-transform:none; letter-spacing:0;">@upcomingDates.Count remaining</span>
+                            </div>
+                            <div style="max-height:300px; overflow-y:auto;">
+                                @if (upcomingDates.Any())
+                                {
+                                    foreach (var day in Model.WorkDays.Where(w => !w.IsRevealed).OrderBy(d => d.Date))
+                                    {
+                                        <div class="ic-day-row upcoming-row" data-date="@day.Date.ToString("yyyy-MM-dd")">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="ic-dot upcoming"></div>
+                                                <div>
+                                                    <div class="ic-day-label">@day.Date.ToString("dddd, dd MMM yyyy")</div>
+                                                    <div class="ic-day-sub">
+                                                        <i class="fas fa-lock" style="font-size:0.65rem;"></i>
+                                                        Topic revealed on the day
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="py-4 text-center" style="color:#3a3d52; font-size:0.85rem;">
+                                        <i class="fas fa-check-circle mb-2 d-block" style="font-size:1.4rem; color:#3dbe7a;"></i>
+                                        No upcoming days
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Past days *@
+                    <div class="col-12">
+                        <div class="ic-panel">
+                            <div class="ic-panel-header d-flex justify-content-between">
+                                <span><i class="fas fa-history me-2"></i>Covered topics</span>
+                                <span style="color:#3dbe7a; font-size:0.78rem; text-transform:none; letter-spacing:0;">@Model.CompletedTopicsCount completed</span>
+                            </div>
+                            <div style="max-height:300px; overflow-y:auto;">
+                                @if (revealedDates.Any())
+                                {
+                                    foreach (var day in Model.WorkDays.Where(w => w.IsRevealed).OrderByDescending(d => d.Date))
+                                    {
+                                        <div class="ic-day-row revealed-row" data-date="@day.Date.ToString("yyyy-MM-dd")"
+                                             onclick="previewDay('@day.Date.ToString("yyyy-MM-dd")')">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="ic-dot revealed"></div>
+                                                <div>
+                                                    <div class="ic-day-label">@day.Date.ToString("dddd, dd MMM yyyy")</div>
+                                                    <div class="ic-day-sub">@day.TopicName</div>
+                                                </div>
+                                            </div>
+                                            <i class="fas fa-chevron-right" style="color:#2e3145; font-size:0.72rem;"></i>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="py-4 text-center" style="color:#3a3d52; font-size:0.85rem;">
+                                        <i class="fas fa-calendar-times mb-2 d-block" style="font-size:1.4rem;"></i>
+                                        No covered topics yet
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        const revealedDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revealedDates));
+        const upcomingDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(upcomingDates));
+        const revealedMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revealedMap));
+
+        @if (Model.InternshipStartDate.HasValue)
+        {
+            <text>const minDate = '@Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")';</text>
+        }
+        else
+        {
+            <text>const minDate = null;</text>
+        }
+
+        @if (Model.InternshipEndDate.HasValue)
+        {
+            <text>const maxDate = '@Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")';</text>
+        }
+        else
+        {
+            <text>const maxDate = null;</text>
+        }
+
+        flatpickr("#calendar-input", {
+        mode: "single",
+        inline: true,
+        dateFormat: "Y-m-d",
+        minDate: minDate,
+        maxDate: maxDate,
+        clickOpens: false,
+        disableMobile: true,
+        onChange: function(dates) {
+        if (!dates.length) return;
+        const dateStr = dates[0].toISOString().split('T')[0];
+        if (revealedDates.includes(dateStr)) {
+        previewDay(dateStr);
+        }
+        },
+        onDayCreate: function(dObj, dStr, fp, dayElem) {
+        const dateStr = dayElem.dateObj.toISOString().split('T')[0];
+        if (revealedDates.includes(dateStr)) {
+        dayElem.style.background = '#1e3a2a';
+        dayElem.style.color = '#3dbe7a';
+        dayElem.style.borderRadius = '0.5rem';
+        dayElem.title = 'Covered — click to view topic';
+        } else if (upcomingDates.includes(dateStr)) {
+        dayElem.style.background = '#1e2d4a';
+        dayElem.style.color = '#7ba8e0';
+        dayElem.style.borderRadius = '0.5rem';
+        dayElem.title = 'Upcoming work day';
+        }
+        }
+        });
+
+        function previewDay(dateStr) {
+        document.querySelectorAll('.ic-day-row').forEach(r => r.classList.remove('active'));
+        const row = document.querySelector(`.ic-day-row[data-date="${dateStr}"]`);
+        if (row) row.classList.add('active');
+
+        const preview = document.getElementById('topic-preview');
+        const data = revealedMap[dateStr];
+
+        if (!data) {
+        preview.innerHTML = `<div style="color:#3a3d52; font-size:0.85rem; text-align:center;">Topic not yet revealed</div>`;
+        preview.classList.add('empty');
+        return;
+        }
+
+        preview.classList.remove('empty');
+        const date = new Date(dateStr + 'T00:00:00');
+        const formatted = date.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+        preview.innerHTML = `
+        <div class="ic-topic-date">${formatted}</div>
+        <div class="ic-topic-name">${data.topicName ?? ''}</div>
+        <div class="ic-topic-desc">${data.topicDescription ?? ''}</div>
+        `;
+        }
+    </script>
+}

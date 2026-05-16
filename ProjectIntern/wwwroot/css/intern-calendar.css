@@ -1,0 +1,324 @@
+﻿.intern-calendar-page {
+    background: #0f1117;
+    min-height: 100vh;
+    color: #e8e6df;
+    font-family: 'DM Sans', sans-serif;
+}
+
+.ic-header {
+    background: linear-gradient(135deg, #1a1d27 0%, #12151e 100%);
+    border-bottom: 1px solid #2a2d3a;
+    padding: 1.5rem 2rem;
+}
+
+.ic-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #1e2235;
+    border: 1px solid #2e3350;
+    border-radius: 2rem;
+    padding: 0.25rem 0.875rem;
+    font-size: 0.78rem;
+    color: #7b8cde;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.ic-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #f0ede6;
+    margin: 0.25rem 0 0;
+    letter-spacing: -0.02em;
+}
+
+.ic-sub {
+    font-size: 0.9rem;
+    color: #6b6f85;
+    margin: 0.25rem 0 0;
+}
+
+.ic-stat {
+    background: #161922;
+    border: 1px solid #252837;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.8rem;
+    color: #8b8fa8;
+}
+
+    .ic-stat strong {
+        color: #e8e6df;
+        font-size: 1rem;
+        display: block;
+    }
+
+.ic-complete-pill {
+    background: #0f2a1a;
+    color: #3dbe7a;
+    border: 1px solid #1a4a2a;
+    border-radius: 1rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+.ic-panel {
+    background: #161922;
+    border: 1px solid #252837;
+    border-radius: 1rem;
+}
+
+.ic-panel-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #252837;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b6f85;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ic-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #5a5e78;
+}
+
+.ic-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+    .ic-legend-dot.revealed {
+        background: #3dbe7a;
+    }
+
+    .ic-legend-dot.upcoming {
+        background: #7ba8e0;
+    }
+
+.ic-progress-track {
+    background: #1e2130;
+    border-radius: 1rem;
+    height: 6px;
+    overflow: hidden;
+}
+
+.ic-progress-fill {
+    background: linear-gradient(90deg, #3d4fd6, #3dbe7a);
+    height: 100%;
+    border-radius: 1rem;
+    transition: width 0.5s ease;
+}
+
+.ic-topic-preview {
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+    .ic-topic-preview.empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 160px;
+        color: #3a3d52;
+    }
+
+.ic-topic-date {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5a5e78;
+    margin-bottom: 0.5rem;
+}
+
+.ic-topic-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f0ede6;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.ic-topic-desc {
+    font-size: 0.85rem;
+    color: #7b7f99;
+    line-height: 1.65;
+}
+
+.ic-day-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.625rem 1.25rem;
+    border-bottom: 1px solid #1e2130;
+    transition: background 0.12s ease;
+    cursor: pointer;
+}
+
+    .ic-day-row:last-child {
+        border-bottom: none;
+    }
+
+    .ic-day-row:hover {
+        background: #1a1d2b;
+    }
+
+    .ic-day-row.active {
+        background: #1e2235;
+    }
+
+    .ic-day-row.upcoming-row {
+        cursor: default;
+    }
+
+.ic-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+    .ic-dot.revealed {
+        background: #3dbe7a;
+    }
+
+    .ic-dot.upcoming {
+        background: #3d4fd6;
+    }
+
+.ic-day-label {
+    font-size: 0.85rem;
+    color: #c0c2d4;
+    font-weight: 500;
+}
+
+.ic-day-sub {
+    font-size: 0.75rem;
+    color: #5a5e78;
+    margin-top: 0.1rem;
+}
+
+/* Flatpickr */
+.flatpickr-calendar {
+    background: #ffffff !important;
+    border: 1px solid #e2e4f0 !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.12) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+
+.flatpickr-days, .dayContainer {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+}
+
+.flatpickr-months {
+    padding: 0.75rem 0.5rem 0;
+}
+
+.flatpickr-month {
+    color: #1a1d27 !important;
+}
+
+.flatpickr-current-month {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #1a1d27 !important;
+}
+
+.flatpickr-monthDropdown-months {
+    background: #f4f5fb !important;
+    color: #1a1d27 !important;
+}
+
+.numInputWrapper span {
+    border-color: #d0d2e0 !important;
+}
+
+    .numInputWrapper span svg path {
+        fill: #9b9fb8 !important;
+    }
+
+.flatpickr-prev-month, .flatpickr-next-month {
+    color: #9b9fb8 !important;
+    fill: #9b9fb8 !important;
+}
+
+    .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
+        color: #1a1d27 !important;
+        fill: #1a1d27 !important;
+    }
+
+.flatpickr-weekdays {
+    background: transparent !important;
+    border-bottom: 1px solid #e8eaf0;
+    padding-bottom: 0.5rem;
+}
+
+.flatpickr-weekday {
+    color: #b0b3c8 !important;
+    font-weight: 600 !important;
+    font-size: 0.72rem !important;
+    letter-spacing: 0.06em !important;
+}
+
+.flatpickr-days {
+    padding: 0.5rem;
+}
+
+.flatpickr-day {
+    color: #3a3d52 !important;
+    border-radius: 0.5rem !important;
+    font-size: 0.85rem !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    transition: all 0.12s ease !important;
+}
+
+    .flatpickr-day:hover {
+        background: #f0f2ff !important;
+        color: #1a1d27 !important;
+        border-color: transparent !important;
+    }
+
+    .flatpickr-day.today {
+        border-color: #c0c8f0 !important;
+        color: #3d4fd6 !important;
+    }
+
+        .flatpickr-day.today:hover {
+            background: #f0f2ff !important;
+        }
+
+    .flatpickr-day.selected, .flatpickr-day.selected:hover {
+        background: transparent !important;
+        border-color: transparent !important;
+        color: #3a3d52 !important;
+        font-weight: normal !important;
+    }
+
+    .flatpickr-day.flatpickr-disabled {
+        color: #d8dae8 !important;
+    }
+
+    .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
+        color: #d0d2e0 !important;
+    }
