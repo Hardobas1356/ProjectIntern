@@ -26,6 +26,15 @@
 <link rel="stylesheet" href="~/css/intern-calendar.css" />
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
+@if (!Model.WorkDays.Any() && Model.SpecialityName == "N/A")
+{
+    <div class="ic-panel p-4 text-center" style="color:#5a5e78;">
+        <i class="fas fa-hourglass-half mb-3 d-block" style="font-size:2rem; color:#3d4fd6;"></i>
+        <h5 style="color:#e8e6df;">Your internship is being set up</h5>
+        <p style="font-size:0.85rem;">Your administrator will assign your speciality and schedule shortly.</p>
+    </div>
+}
+
 <div class="intern-calendar-page">
 
     @* Header *@
