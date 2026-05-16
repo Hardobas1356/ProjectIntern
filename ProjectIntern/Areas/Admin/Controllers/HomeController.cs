@@ -2,7 +2,7 @@
 
 namespace ProjectIntern.Areas.Admin.Controllers;
 
-public class AdminController : BaseAdminController
+public class HomeController : BaseAdminController
 {
     public IActionResult Index()
     {
