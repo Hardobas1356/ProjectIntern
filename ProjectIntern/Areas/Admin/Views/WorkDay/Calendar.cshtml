@@ -1,826 +1,272 @@
 ﻿@model ProjectIntern.Web.ViewModels.Admin.WorkDay.InternCalendarAdminViewModel
-
 @{
     ViewData["Title"] = $"Calendar – {Model.InternName}";
-
     var workDayDates = Model.WorkDays.Select(w => w.Date.ToString("yyyy-MM-dd")).ToList();
     var workDayMap = Model.WorkDays.ToDictionary(
         w => w.Date.ToString("yyyy-MM-dd"),
         w => new { w.TopicName, w.TopicDescription }
     );
 }
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-<style>
-    .calendar-page {
-        background: #f8f9fa;
-        min-height: 100vh;
-        color: #2d3142;
-        font-family: 'DM Sans', sans-serif;
-    }
 
-    .calendar-wrapper-panel {
-        display: block;
-        width: 100%;
-        max-width: 340px;
-        margin: 0 auto;
-    }
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Calendar</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item">
+            <a asp-area="Admin" asp-controller="User" asp-action="AllUsers">All Users</a>
+        </li>
+        <li class="breadcrumb-item active">@Model.InternName</li>
+    </ol>
 
-    .calendar-page .panel .py-3 {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-    }
-
-    .flatpickr-calendar.inline {
-        height: auto !important;
-    }
-
-    .intern-header .btn-secondary-outline {
-        background: transparent;
-        color: #5a5e78;
-        border: 1px solid #e2e4f0;
-        border-radius: 0.625rem;
-        padding: 0.625rem 1.25rem;
-        font-size: 0.85rem;
-        font-weight: 500;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        transition: all 0.15s ease;
-    }
-
-    .intern-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: #eef2ff;
-        border: 1px solid #cdd5f3;
-        border-radius: 2rem;
-        padding: 0.25rem 0.875rem;
-        font-size: 0.78rem;
-        color: #3d4fd6;
-        font-weight: 500;
-        letter-spacing: 0.04em;
-        text-transform: uppercase;
-    }
-
-    .intern-name {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #1a1d27;
-        margin: 0.25rem 0 0;
-        letter-spacing: -0.02em;
-    }
-
-    .stat-chip {
-        background: #ffffff;
-        border: 1px solid #e2e4f0;
-        border-radius: 0.75rem;
-        padding: 0.625rem 1rem;
-        font-size: 0.8rem;
-        color: #6b6f85;
-    }
-
-        .stat-chip strong {
-            color: #1a1d27;
-            font-size: 1rem;
-            display: block;
+    @* Intern summary *@
+    <div class="d-flex flex-wrap gap-2 align-items-center mb-4">
+        <span class="badge bg-primary fs-6">@Model.SpecialityName</span>
+        <span class="fw-bold fs-5">@Model.InternName</span>
+        <span class="badge bg-secondary">@Model.WorkDays.Count() work days</span>
+        @if (Model.InternshipStartDate.HasValue)
+        {
+            <span class="badge bg-light text-dark border">
+                Start: @Model.InternshipStartDate.Value.ToString("dd MMM yyyy")
+            </span>
         }
-
-    .panel {
-        background: #ffffff;
-        border: 1px solid #e2e4f0;
-        border-radius: 1rem;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-    }
-
-    .panel-header {
-        padding: 1rem 1.25rem;
-        border-bottom: 1px solid #e2e4f0;
-        font-size: 0.78rem;
-        font-weight: 600;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: #8b8fa8;
-    }
-
-    /* --- FIXED FLATPICKR LAYOUT RULES --- */
-    .flatpickr-calendar {
-        background: #ffffff !important;
-        border: none !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        width: 307.875px !important; /* Set native default block container width */
-        margin: 0 auto;
-        font-family: 'DM Sans', sans-serif !important;
-    }
-
-    .flatpickr-months {
-        padding: 0.75rem 0.5rem 0;
-    }
-
-    .flatpickr-month {
-        color: #1a1d27 !important;
-    }
-
-    .flatpickr-current-month {
-        font-size: 1rem !important;
-        font-weight: 600 !important;
-        color: #1a1d27 !important;
-    }
-
-    .flatpickr-monthDropdown-months {
-        background: #f4f5fb !important;
-        color: #1a1d27 !important;
-    }
-
-    .numInputWrapper span {
-        border-color: #d0d2e0 !important;
-    }
-
-        .numInputWrapper span svg path {
-            fill: #9b9fb8 !important;
+        @if (Model.InternshipEndDate.HasValue)
+        {
+            <span class="badge bg-light text-dark border">
+                End: @Model.InternshipEndDate.Value.ToString("dd MMM yyyy")
+            </span>
         }
-
-    .flatpickr-prev-month, .flatpickr-next-month {
-        color: #9b9fb8 !important;
-        fill: #9b9fb8 !important;
-    }
-
-        .flatpickr-prev-month:hover, .flatpickr-next-month:hover {
-            color: #1a1d27 !important;
-            fill: #1a1d27 !important;
+        @if (Model.HasCompletedCurriculum)
+        {
+            <span class="badge bg-success">
+                Curriculum complete
+            </span>
         }
+        <a asp-controller="User" asp-action="AllUsers" class="btn btn-sm btn-outline-secondary ms-auto">
+        Back
+        </a>
+    </div>
 
-    .flatpickr-weekdays {
-        background: transparent !important;
-        border-bottom: 1px solid #e8eaf0;
-        padding-bottom: 0.5rem;
-    }
-
-    .flatpickr-weekday {
-        color: #b0b3c8 !important;
-        font-weight: 600 !important;
-        font-size: 0.72rem !important;
-        letter-spacing: 0.06em !important;
-    }
-
-    .flatpickr-days {
-        padding: 0.5rem 0 0 0;
-        width: 307.875px !important;
-    }
-
-    .dayContainer {
-        width: 296.875px !important;
-        min-width: 296.875px !important;
-        max-width: 296.875px !important;
-    }
-
-    .flatpickr-day {
-        color: #3a3d52 !important;
-        border-radius: 0.5rem !important;
-        font-size: 0.85rem !important;
-        height: 38px !important;
-        line-height: 38px !important;
-        max-width: 38px !important;
-        margin-top: 2px !important;
-        transition: all 0.12s ease !important;
-    }
-
-        .flatpickr-day:hover {
-            background: #f0f2ff !important;
-            color: #1a1d27 !important;
-            border-color: transparent !important;
-        }
-
-        .flatpickr-day.today {
-            border-color: #c0c8f0 !important;
-            color: #3d4fd6 !important;
-        }
-
-            .flatpickr-day.today:hover {
-                background: #f0f2ff !important;
-            }
-
-        .flatpickr-day.selected, .flatpickr-day.selected:hover {
-            background: #3d4fd6 !important;
-            border-color: #3d4fd6 !important;
-            color: #fff !important;
-            font-weight: 600 !important;
-        }
-
-        .flatpickr-day.flatpickr-disabled {
-            color: #e2e4f0 !important;
-        }
-
-        .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
-            color: #b0b3c8 !important;
-        }
-
-    /* Topic preview panel */
-    .topic-preview {
-        transition: all 0.2s ease;
-    }
-
-        .topic-preview.empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 180px;
-            color: #b0b3c8;
-        }
-
-        .topic-preview .topic-date {
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: #8b8fa8;
-            margin-bottom: 0.5rem;
-        }
-
-        .topic-preview .topic-name {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #1a1d27;
-            margin-bottom: 0.625rem;
-            line-height: 1.3;
-        }
-
-        .topic-preview .topic-desc {
-            font-size: 0.85rem;
-            color: #5a5e78;
-            line-height: 1.65;
-        }
-
-    /* Action buttons */
-    .btn-add {
-        background: #3d4fd6;
-        color: #fff;
-        border: none;
-        border-radius: 0.625rem;
-        padding: 0.625rem 1.25rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-        .btn-add:hover {
-            background: #2a3bc2;
-            transform: translateY(-1px);
-        }
-
-        .btn-add:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-    .btn-remove {
-        background: transparent;
-        color: #c0394a;
-        border: 1px solid #f3d1d5;
-        border-radius: 0.625rem;
-        padding: 0.625rem 1.25rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-        .btn-remove:hover {
-            background: #fff5f6;
-            border-color: #c0394a;
-            transform: translateY(-1px);
-        }
-
-        .btn-remove:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-    .btn-secondary-outline {
-        background: transparent;
-        color: #1a1d27;
-        border-color: #b0b3c8;
-        border-radius: 0.625rem;
-        padding: 0.5rem 0.8rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-
-    .btn-secondary-outline:hover {
-        background: #fff5f6;
-        border-color: #c0394a;
-        transform: translateY(-1px);
-    }
-
-    /* Selection summary */
-    .selection-summary {
-        background: #f4f5fb;
-        border: 1px solid #e2e4f0;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
-        font-size: 0.82rem;
-        color: #5a5e78;
-        min-height: 2.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-        .selection-summary .count-badge {
-            background: #3d4fd6;
-            color: #fff;
-            border-radius: 1rem;
-            padding: 0.1rem 0.5rem;
-            font-weight: 700;
-            font-size: 0.78rem;
-        }
-
-    /* Toast alerts */
-    .toast-container {
-        position: fixed;
-        bottom: 1.5rem;
-        right: 1.5rem;
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .toast-msg {
-        background: #ffffff;
-        border: 1px solid #e2e4f0;
-        border-radius: 0.75rem;
-        padding: 0.75rem 1.125rem;
-        font-size: 0.85rem;
-        color: #2d3142;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
-        display: flex;
-        align-items: center;
-        gap: 0.625rem;
-        animation: slideIn 0.2s ease;
-        max-width: 320px;
-    }
-
-        .toast-msg.success {
-            border-left: 4px solid #3dbe7a;
-        }
-
-        .toast-msg.error {
-            border-left: 4px solid #c0394a;
-        }
-
-        .toast-msg.warning {
-            border-left: 4px solid #e0963a;
-        }
-
-    @@keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateX(20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-
-    /* Work day list */
-    .day-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.625rem 1.25rem;
-        border-bottom: 1px solid #f0f2ff;
-        transition: background 0.12s ease;
-        cursor: pointer;
-    }
-
-        .day-row:last-child {
-            border-bottom: none;
-        }
-
-        .day-row:hover {
-            background: #f8f9fa;
-        }
-
-        .day-row.active {
-            background: #f0f2ff;
-        }
-
-    .day-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #3d4fd6;
-        flex-shrink: 0;
-    }
-
-    .day-label {
-        font-size: 0.85rem;
-        color: #2d3142;
-        font-weight: 500;
-    }
-
-    .day-topic {
-        font-size: 0.75rem;
-        color: #6b6f85;
-        margin-top: 0.1rem;
-    }
-
-    .completed-pill {
-        background: #e6f8ee;
-        color: #1e7e44;
-        border: 1px solid #c3edd5;
-        border-radius: 1rem;
-        padding: 0.125rem 0.625rem;
-        font-size: 0.72rem;
-        font-weight: 600;
-    }
-</style>
-
-<div class="calendar-page pt-5">
-    <div class="container-fluid px-4">
-        
-        @* Header *@
-        <div class="intern-header mb-2">
-            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-                <div>
-                    <nav aria-label="breadcrumb" class="mb-2">
-                        <ol class="breadcrumb mb-0" style="font-size:0.78rem; --bs-breadcrumb-divider-color:#3a3d52; color:#5a5e78;">
-                            <li class="breadcrumb-item"><a asp-controller="User" asp-action="AllUsers" style="color:#5a5e78; text-decoration:none;">Users</a></li>
-                            <li class="breadcrumb-item active" style="color:#3a3d52;">Calendar</li>
-                        </ol>
-                    </nav>
-                    <div class="intern-badge mb-2">
-                        <i class="fas fa-circle" style="font-size:0.45rem; color:#3d4fd6;"></i>
-                        @Model.SpecialityName
-                    </div>
-                    <h1 class="intern-name">@Model.InternName</h1>
+    <div class="row g-4">
+        @* Left — Calendar + Actions *@
+        <div class="col">
+            <div class="card shadow-sm" style="width: 330px;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Select days</span>
+                    <small class="text-muted">Click to select<br />Click again to deselect</small>
                 </div>
-                <div class="d-flex gap-2 align-items-center flex-wrap">
-                    <div class="stat-chip">
-                        <strong>@Model.WorkDays.Count()</strong>
-                        Work days
-                    </div>
-                    @if (Model.InternshipStartDate.HasValue)
-                    {
-                        <div class="stat-chip">
-                            <strong>@Model.InternshipStartDate.Value.ToString("dd MMM yyyy")</strong>
-                            Start date
-                        </div>
-                    }
-                    @if (Model.InternshipEndDate.HasValue)
-                    {
-                        <div class="stat-chip">
-                            <strong>@Model.InternshipEndDate.Value.ToString("dd MMM yyyy")</strong>
-                            End date
-                        </div>
-                    }
-                    @if (Model.HasCompletedCurriculum)
-                    {
-                        <span class="completed-pill"><i class="fas fa-check me-1"></i>Curriculum complete</span>
-                    }
-                    <a asp-controller="User" asp-action="AllUsers" class="btn-secondary-outline">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </a>
+                <div class="card-body p-2">
+                    <input id="calendar-input" type="text" style="display:none;" />
                 </div>
+            </div>
+
+            <div class="alert alert-light border mb-3 py-2" style="width: 330px" id="selection-summary">
+                <span id="summary-text">No dates selected</span>
+            </div>
+
+            <div class="d-flex gap-3 flex-wrap justify-content-center" style="max-width: 330px;">
+                <button class="btn btn-primary" id="btn-add" onclick="addDays()" disabled>
+                    Add days
+                </button>
+                <button class="btn btn-outline-danger" id="btn-remove" onclick="removeDays()" disabled>
+                    Remove days
+                </button>
+                <button class="btn btn-outline-secondary" onclick="clearSelection()">
+                    Clear
+                </button>
             </div>
         </div>
 
-        @* Main layout *@
-        <div class="py-4">
-            <div class="row g-4">
+        @* Right — Topic preview + Work day list *@
+        <div class="col-xl-7 col-lg-6">
 
-                @* Left — Calendar + Actions *@
-                <div class="col-xl-5 col-lg-6 d-flex flex-column align-items-center">
-
-                    @* Flatpickr inline calendar *@
-                    <div class="panel mb-3 calendar-wrapper-panel">
-                        <div class="panel-header d-flex justify-content-between align-items-center">
-                            <span><i class="fas fa-calendar-alt me-2"></i>Select days</span>
-                            <span style="font-size:0.72rem; color:#8b8fa8; text-transform:none; letter-spacing:0;">Click to select</span>
-                        </div>
-                        <div class="d-flex justify-content-center py-2">
-                            <input id="calendar-input" type="text" style="display:none;" />
-                        </div>
-                    </div>
-
-                    @* Selection summary — Centered and constrained *@
-                    <div class="selection-summary mb-3 w-100" id="selection-summary" style="max-width: 340px;">
-                        <i class="fas fa-hand-pointer" style="color:#5a5e78;"></i>
-                        <span id="summary-text">No dates selected</span>
-                    </div>
-
-                    @* Action buttons — Centered, constrained, and justified *@
-                    <div class="d-flex justify-content-center gap-2 flex-wrap w-100" style="max-width: 340px;">
-                        <button class="btn-add" id="btn-add" onclick="addDays()" disabled>
-                            Add days
-                        </button>
-                        <button class="btn-remove" id="btn-remove" onclick="removeDays()" disabled>
-                            Remove days
-                        </button>
-                        <button class="btn-secondary-outline" onclick="clearSelection()">
-                        Clear
-                        </button>
-                    </div>
+            @* Topic preview *@
+            <div class="card shadow-sm mb-3">
+                <div class="card-header">
+                    Topic preview
                 </div>
-
-                @* Right — Topic preview + Work day list *@
-                <div class="col-xl-7 col-lg-6">
-                    <div class="row g-3">
-
-                        @* Topic preview *@
-                        <div class="col-12">
-                            <div class="panel">
-                                <div class="panel-header"><i class="fas fa-book-open me-2"></i>Topic preview</div>
-                                <div class="p-3 topic-preview empty" id="topic-preview">
-                                    <i class="fas fa-mouse-pointer mb-2" style="font-size:1.5rem;"></i>
-                                    <span style="font-size:0.85rem;">Click a highlighted day to preview its topic</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        @* Work day list *@
-                        <div class="col-12">
-                            <div class="panel">
-                                <div class="panel-header d-flex justify-content-between">
-                                    <span><i class="fas fa-list me-2"></i>Assigned work days</span>
-                                    <span id="day-count-label" style="color:#3d4fd6; font-size:0.78rem; text-transform:none; letter-spacing:0;">@Model.WorkDays.Count() days</span>
-                                </div>
-                                <div id="work-days-list" style="max-height: 380px; overflow-y: auto;">
-                                    @if (Model.WorkDays.Any())
-                                    {
-                                        foreach (var day in Model.WorkDays.OrderBy(d => d.Date))
-                                        {
-                                            <div class="day-row" data-date="@day.Date.ToString("yyyy-MM-dd")" onclick="previewDay('@day.Date.ToString("yyyy-MM-dd")')">
-                                                <div class="d-flex align-items-center gap-3">
-                                                    <div class="day-dot"></div>
-                                                    <div>
-                                                        <div class="day-label">@day.Date.ToString("dddd, dd MMM yyyy")</div>
-                                                        <div class="day-topic">@day.TopicName</div>
-                                                    </div>
-                                                </div>
-                                                <i class="fas fa-chevron-right" style="color:#8b8fa8; font-size:0.72rem;"></i>
-                                            </div>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <div class="py-5 text-center" style="color:#b0b3c8; font-size:0.85rem;" id="empty-list-msg">
-                                            <i class="fas fa-calendar-times mb-2 d-block" style="font-size:1.5rem;"></i>
-                                            No work days assigned yet
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                <div class="card-body text-center text-muted" id="topic-preview" style="min-height:140px;">
+                    <span>Click a highlighted day to preview its topic</span>
                 </div>
             </div>
+
+            @* Work day list *@
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Assigned work days</span>
+                    <span class="text-primary fw-semibold" id="day-count-label">@Model.WorkDays.Count() days</span>
+                </div>
+                <div style="max-height:380px; overflow-y:auto;">
+                    @if (Model.WorkDays.Any())
+                    {
+                        foreach (var day in Model.WorkDays.OrderBy(d => d.Date))
+                        {
+                            <div class="day-row d-flex justify-content-between align-items-center px-3 py-2 border-bottom"
+                                 data-date="@day.Date.ToString("yyyy-MM-dd")"
+                                 onclick="previewDay('@day.Date.ToString("yyyy-MM-dd")')">
+                                <div>
+                                    <div class="fw-semibold small">@day.Date.ToString("dddd, dd MMM yyyy")</div>
+                                    <div class="text-muted" style="font-size:0.75rem;">@day.TopicName</div>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted py-5">
+                            No work days assigned yet
+                        </div>
+                    }
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
 
-@* Toast container *@
-<div class="toast-container" id="toast-container"></div>
+<div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index:9999;"></div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script>
-        const internId = '@Model.InternId';
-        const addUrl = '@Url.Action("AddDays", "WorkDay")';
-        const removeUrl = '@Url.Action("RemoveDays", "WorkDay")';
-        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    const internId = '@Model.InternId';
+    const addUrl = '@Url.Action("AddDays", "WorkDay")';
+    const removeUrl = '@Url.Action("RemoveDays", "WorkDay")';
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+    const existingDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayDates));
+    const workDayMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayMap));
 
-        const existingDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayDates));
-        const workDayMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayMap));
+    @if (Model.InternshipStartDate.HasValue)
+    {<text>const minDate = '@Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")';</text>}
+    else
+    {<text>const minDate = null;</text>}
 
-        @if (Model.InternshipStartDate.HasValue)
-        {
-            <text>const minDate = '@Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")';</text>
-        }
-        else
-        {
-            <text>const minDate = null;</text>
-        }
+    @if (Model.InternshipEndDate.HasValue)
+    {<text>const maxDate = '@Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")';</text>}
+    else
+    {<text>const maxDate = null;</text>}
 
-        @if (Model.InternshipEndDate.HasValue)
-        {
-            <text>const maxDate = '@Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")';</text>
-        }
-        else
-        {
-            <text>const maxDate = null;</text>
-        }
+    let selectedDates = [];
 
-        let selectedDates = [];
-
-        const fp = flatpickr("#calendar-input", {
+    const fp = flatpickr("#calendar-input", {
         mode: "multiple",
         inline: true,
         dateFormat: "Y-m-d",
         minDate: minDate,
         maxDate: maxDate,
-        defaultDate: [],
         disableMobile: true,
-        onChange: function(dates, dateStr) {
-        selectedDates = dates.map(d => formatDate(d));
-        updateSummary();
-        updateButtons();
+        onChange: function(dates) {
+            selectedDates = dates.map(d => formatDate(d));
+            updateSummary();
+            updateButtons();
+            if (selectedDates.length === 1 && existingDates.includes(selectedDates[0]))
+                previewDay(selectedDates[0]);
         },
         onDayCreate: function(dObj, dStr, fp, dayElem) {
-        const dateStr = formatDate(dayElem.dateObj);
-        if (existingDates.includes(dateStr)) {
-        // Refactored day element backgrounds match the light theme color rules cleanly
-        dayElem.style.background = '#eef2ff';
-        dayElem.style.color = '#3d4fd6';
-        dayElem.style.borderRadius = '0.5rem';
+            const dateStr = formatDate(dayElem.dateObj);
+            if (existingDates.includes(dateStr)) {
+                dayElem.style.background = '#cfe2ff';
+                dayElem.style.color = '#0a58ca';
+                dayElem.style.borderRadius = '4px';
+            }
         }
-        }
-        });
+    });
 
-        function formatDate(d) {
-        return d.toISOString().split('T')[0];
-        }
+    function formatDate(d) { return d.toISOString().split('T')[0]; }
 
-        function updateSummary() {
-        const summaryEl = document.getElementById('summary-text');
-        const countBadge = selectedDates.length > 0
-        ? `<span class="count-badge">${selectedDates.length}</span>`
-        : '';
-
-        if (selectedDates.length === 0) {
-        summaryEl.innerHTML = 'No dates selected';
-        } else {
-        const existing = selectedDates.filter(d => existingDates.includes(d));
+    function updateSummary() {
+        const el = document.getElementById('summary-text');
+        if (!selectedDates.length) { el.innerHTML = 'No dates selected'; return; }
         const newDates = selectedDates.filter(d => !existingDates.includes(d));
+        const existing = selectedDates.filter(d => existingDates.includes(d));
         let parts = [];
-        if (newDates.length) parts.push(`<span style="color:#3d4fd6; font-weight:600;">${newDates.length} new</span>`);
-        if (existing.length) parts.push(`<span style="color:#c0394a; font-weight:600;">${existing.length} to remove</span>`);
-        summaryEl.innerHTML = `${countBadge} ${parts.join(' · ')} selected`;
-        }
-        }
+        if (newDates.length) parts.push(`<strong class="text-primary">${newDates.length} new</strong>`);
+        if (existing.length) parts.push(`<strong class="text-danger">${existing.length} to remove</strong>`);
+        el.innerHTML = `<span class="badge bg-primary me-1">${selectedDates.length}</span> ${parts.join(' · ')} selected`;
+    }
 
-        function updateButtons() {
-        const hasNew = selectedDates.some(d => !existingDates.includes(d));
-        const hasExisting = selectedDates.some(d => existingDates.includes(d));
-        document.getElementById('btn-add').disabled = !hasNew;
-        document.getElementById('btn-remove').disabled = !hasExisting;
-        }
+    function updateButtons() {
+        document.getElementById('btn-add').disabled = !selectedDates.some(d => !existingDates.includes(d));
+        document.getElementById('btn-remove').disabled = !selectedDates.some(d => existingDates.includes(d));
+    }
 
-        function clearSelection() {
+    function clearSelection() {
         fp.clear();
         selectedDates = [];
         updateSummary();
         updateButtons();
-        }
+    }
 
-        function previewDay(dateStr) {
+    function previewDay(dateStr) {
         document.querySelectorAll('.day-row').forEach(r => r.classList.remove('active'));
-        const row = document.querySelector(`.day-row[data-date="${dateStr}"]`);
-        if (row) row.classList.add('active');
-
+        document.querySelector(`.day-row[data-date="${dateStr}"]`)?.classList.add('active');
         const preview = document.getElementById('topic-preview');
         const data = workDayMap[dateStr];
-
-        if (!data) {
-        preview.innerHTML = `<div style="color:#8b8fa8; font-size:0.85rem; text-align:center;">No data for this day</div>`;
-        preview.classList.add('empty');
-        return;
-        }
-
-        preview.classList.remove('empty');
-        const date = new Date(dateStr + 'T00:00:00');
-        const formatted = date.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-
+        if (!data) { preview.innerHTML = `<p class="text-muted mt-3">No data for this day</p>`; return; }
+        const formatted = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
         preview.innerHTML = `
-        <div class="topic-date">${formatted}</div>
-        <div class="topic-name">${data.TopicName ?? ''}</div>
-        <div class="topic-desc">${data.TopicDescription ?? ''}</div>
-        `;
-        }
+            <p class="text-muted small text-uppercase fw-semibold mb-1 mt-2">${formatted}</p>
+            <h5 class="fw-bold">${data.TopicName ?? ''}</h5>
+            <p class="text-muted">${data.TopicDescription ?? ''}</p>`;
+    }
 
-        async function addDays() {
+    async function addDays() {
         const newDates = selectedDates.filter(d => !existingDates.includes(d));
         if (!newDates.length) return;
-
         setLoading('btn-add', true);
-
         try {
-        const res = await fetch(addUrl, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'RequestVerificationToken': token
-        },
-        body: JSON.stringify({ internId, dates: newDates })
-        });
+            const res = await fetch(addUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify({ internId, dates: newDates })
+            });
+            const json = await res.json();
+            res.ok ? toast('success', json.message ?? 'Work days added.') : toast('danger', json.message ?? 'Failed to add work days.');
+            if (res.ok) setTimeout(() => location.reload(), 1000);
+        } catch { toast('danger', 'Network error. Please try again.'); }
+        finally { setLoading('btn-add', false); }
+    }
 
-        const json = await res.json();
-
-        if (res.ok) {
-        toast('success', json.message ?? 'Work days added.');
-        setTimeout(() => location.reload(), 1000);
-        } else {
-        toast('error', json.message ?? 'Failed to add work days.');
-        }
-        } catch {
-        toast('error', 'Network error. Please try again.');
-        } finally {
-        setLoading('btn-add', false);
-        }
-        }
-
-        async function removeDays() {
+    async function removeDays() {
         const toRemove = selectedDates.filter(d => existingDates.includes(d));
         if (!toRemove.length) return;
-
         const past = toRemove.filter(d => new Date(d) < new Date(new Date().toDateString()));
-        if (past.length) {
-        const confirmed = confirm(
-        `${past.length} of the selected day(s) have already passed. Removing past days will not affect curriculum progress. Continue?`
-        );
-        if (!confirmed) return;
-        }
-
+        if (past.length && !confirm(`${past.length} day(s) have already passed. Removing them will not affect curriculum progress. Continue?`)) return;
         setLoading('btn-remove', true);
-
         try {
-        const res = await fetch(removeUrl, {
-        method: 'POST',
-        headers: {
-        'Content-Type': 'application/json',
-        'RequestVerificationToken': token
-        },
-        body: JSON.stringify({ internId, dates: toRemove })
-        });
+            const res = await fetch(removeUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
+                body: JSON.stringify({ internId, dates: toRemove })
+            });
+            const json = await res.json();
+            res.ok ? toast('success', json.message ?? 'Work days removed.') : toast('danger', json.message ?? 'Failed to remove work days.');
+            if (res.ok) setTimeout(() => location.reload(), 1000);
+        } catch { toast('danger', 'Network error. Please try again.'); }
+        finally { setLoading('btn-remove', false); }
+    }
 
-        const json = await res.json();
-
-        if (res.ok) {
-        toast('success', json.message ?? 'Work days removed.');
-        setTimeout(() => location.reload(), 1000);
-        } else {
-        toast('error', json.message ?? 'Failed to remove work days.');
-        }
-        } catch {
-        toast('error', 'Network error. Please try again.');
-        } finally {
-        setLoading('btn-remove', false);
-        }
-        }
-
-        function setLoading(btnId, loading) {
+    function setLoading(btnId, loading) {
         const btn = document.getElementById(btnId);
         btn.disabled = loading;
-        if (loading) {
-        btn.dataset.original = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-        } else {
-        btn.innerHTML = btn.dataset.original ?? btn.innerHTML;
-        updateButtons();
-        }
-        }
+        btn.innerHTML = loading ? 'Saving...' : (btn.dataset.original ?? btn.innerHTML);
+        if (!loading) { btn.dataset.original = btn.innerHTML; updateButtons(); }
+    }
 
-        function toast(type, message) {
-        const container = document.getElementById('toast-container');
+    function toast(type, message) {
         const el = document.createElement('div');
-        el.className = `toast-msg ${type}`;
-        const icon = type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-times-circle';
-        const color = type === 'success' ? '#3dbe7a' : type === 'warning' ? '#e0963a' : '#c0394a';
-        el.innerHTML = `<i class="fas ${icon}" style="color:${color};"></i> ${message}`;
-        container.appendChild(el);
+        el.className = `alert alert-${type} alert-dismissible fade show shadow-sm`;
+        el.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+        document.getElementById('toast-container').appendChild(el);
         setTimeout(() => el.remove(), 4000);
-        }
+    }
 
-        (function ensureToken() {
+    (function ensureToken() {
         if (!document.querySelector('input[name="__RequestVerificationToken"]')) {
-        const form = document.createElement('form');
-        form.innerHTML = '@Html.AntiForgeryToken()';
-        document.body.appendChild(form);
+            const f = document.createElement('form');
+            f.innerHTML = '@Html.AntiForgeryToken()';
+            document.body.appendChild(f);
         }
-        })();
-    </script>
+    })();
+</script>
 }
