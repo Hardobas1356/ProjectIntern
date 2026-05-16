@@ -14,7 +14,7 @@
     <h1 class="mt-4">Calendar</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item">
-            <a asp-area="Admin" asp-controller="User" asp-action="AllUsers">All Users</a>
+            <a asp-area="Admin" asp-controller="User" asp-action="Index">All Users</a>
         </li>
         <li class="breadcrumb-item active">@Model.InternName</li>
     </ol>
@@ -42,7 +42,7 @@
                 Curriculum complete
             </span>
         }
-        <a asp-controller="User" asp-action="AllUsers" class="btn btn-sm btn-outline-secondary ms-auto">
+        <a asp-controller="User" asp-action="Index" class="btn btn-sm btn-outline-secondary ms-auto">
         Back
         </a>
     </div>
