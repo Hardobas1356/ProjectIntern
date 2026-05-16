@@ -2,8 +2,17 @@
 @model InternshipSpecialityCreateInputModel
 
 <div class="container-fluid px-4">
+
     <h1 class="mt-4">Create Speciality</h1>
-    
+    <div class="mt-4 mb-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a asp-action="Index">Specialities</a></li>
+                <li class="breadcrumb-item active">Create</li>
+            </ol>
+        </nav>
+    </div>
+
     <div class="card shadow-sm col-md-8">
         <div class="card-body">
             <form asp-action="Create" method="post">
