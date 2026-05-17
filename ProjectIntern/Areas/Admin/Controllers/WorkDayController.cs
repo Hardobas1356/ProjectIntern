@@ -50,7 +50,7 @@ public class WorkDayController : BaseAdminController
         try
         {
             IEnumerable<DateTime> dates = request.Dates
-                .Select(d => DateTime.Parse(d));
+                .Select(d => DateTime.SpecifyKind(DateTime.Parse(d), DateTimeKind.Utc));
 
             await workDayService.CreateWorkDayAsync(request.InternId, dates, adminId);
             return Ok(new { message = "Work days added successfully." });
@@ -79,7 +79,7 @@ public class WorkDayController : BaseAdminController
         try
         {
             IEnumerable<DateTime> dates = request.Dates
-                .Select(d => DateTime.Parse(d));
+                .Select(d => DateTime.SpecifyKind(DateTime.Parse(d), DateTimeKind.Utc));
 
             await workDayService.DeleteWorkDaysAsync(request.InternId, dates, adminId);
             return Ok(new { message = "Work days removed successfully." });
