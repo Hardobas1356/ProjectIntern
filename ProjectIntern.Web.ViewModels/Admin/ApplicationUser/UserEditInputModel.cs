@@ -28,5 +28,6 @@ public class UserEditInputModel
     [Display(Name = "Has Completed Curriculum")]
     public bool HasCompletedCurriculum { get; set; } = false;
     public bool IsAdmin { get; set; } = false;
+    public bool IsDeleted { get; set; } = false;
     public IEnumerable<SelectListItem> Specialities { get; set; } = new HashSet<SelectListItem>();
 }

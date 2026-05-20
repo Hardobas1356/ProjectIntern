@@ -139,6 +139,7 @@ public class ApplicationUserService : IApplicationUserService
             InternshipEndDate = user.InternshipEndDate,
             HasCompletedCurriculum = user.HasCompletedCurriculum,
             IsAdmin = userManager.IsInRoleAsync(user, "Admin").Result,
+            IsDeleted = user.IsDeleted,
             Specialities = specialities.Select(s => new SelectListItem
             {
                 Value = s.Id.ToString(),
@@ -150,9 +151,30 @@ public class ApplicationUserService : IApplicationUserService
         return model;
     }
 
+    public async Task HardDeleteUserAsync(Guid id)
+    {
+        ApplicationUser? user = await userManager.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Id == id);
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {id} not found.");
+        }
+
+        IdentityResult result = await userManager.DeleteAsync(user);
+
+        if (!result.Succeeded)
+        {
+            string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to delete user: {errors}");
+        }
+    }
+
     public async Task MakeAdminAsync(Guid id)
     {
-        ApplicationUser? user = await userManager.FindByIdAsync(id.ToString())
+        ApplicationUser? user = await userManager
+            .FindByIdAsync(id.ToString())
             ?? throw new KeyNotFoundException($"User with ID {id} not found.");
 
         if (user != null)

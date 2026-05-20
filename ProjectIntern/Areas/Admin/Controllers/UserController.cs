@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
+using System.Security.Claims;
 
 namespace ProjectIntern.Areas.Admin.Controllers;
 
@@ -128,20 +129,21 @@ public class UserController : BaseAdminController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> HardDeleteUser(Guid id)
     {
-        //try
-        //{
-        //    await applicationUserService.HardDeleteUserAsync(id);
-        //    TempData["SuccessMessage"] = "User has been permanently deleted.";
-        //}
-        //catch (Exception ex)
-        //{
-        //    logger.LogError(ex, $"Error permanently deleting user {id}");
-        //    TempData["ErrorMessage"] = "Failed to permanently delete the user.";
-        //}
-        //return RedirectToAction(nameof(Index));
-        throw new NotImplementedException("Hard delete is not implemented to prevent accidental data loss.");
+        try
+        {
+            await applicationUserService.HardDeleteUserAsync(id);
+            TempData["SuccessMessage"] = "User has been permanently deleted.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error permanently deleting user {id}");
+            TempData["ErrorMessage"] = "Failed to permanently delete the user.";
+        }
+        return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> MakeAdmin(Guid id)
     {
         try
@@ -154,22 +156,31 @@ public class UserController : BaseAdminController
             logger.LogError(ex, $"Error granting admin privileges to user {id}");
             TempData["ErrorMessage"] = "Failed to grant admin privileges.";
         }
-        return RedirectToAction(nameof(Edit), new { id });
+        return RedirectToAction(nameof(Index));
     }
 
-    public async Task<IActionResult> RemoveAdmin(Guid id, Guid actingUserId)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveAdmin(Guid id)
     {
+        Guid actingUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         try
         {
             await applicationUserService.RemoveAdminAsync(id, actingUserId);
             TempData["SuccessMessage"] = "Admin privileges have been revoked from the user.";
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogWarning(ex, $"Cannot remove admin from user {id}");
+            TempData["ErrorMessage"] = ex.Message;
         }
         catch (Exception ex)
         {
             logger.LogError(ex, $"Error revoking admin privileges from user {id}");
             TempData["ErrorMessage"] = "Failed to revoke admin privileges.";
         }
-        return RedirectToAction(nameof(Edit), new { id });
+        return RedirectToAction(nameof(Index));
     }
 
     private async Task RefreshSpecialitiesAsync(UserEditInputModel model)

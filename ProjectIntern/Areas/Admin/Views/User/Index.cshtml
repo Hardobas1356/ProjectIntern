@@ -45,7 +45,7 @@
             </div>
         </div>
         <div class="card-body">
-            <form asp-area="Admin" asp-controller="User" asp-action="AllUsers" method="get" class="row g-3 mb-4 align-items-center">
+            <form asp-area="Admin" asp-controller="User" asp-action="Index" method="get" class="row g-3 mb-4 align-items-center">
                 <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" name="searchTerm" value="@ViewData["SearchTerm"]"
@@ -55,7 +55,7 @@
                         </button>
                         @if (!string.IsNullOrWhiteSpace(ViewData["SearchTerm"]?.ToString()))
                         {
-                            <a asp-action="AllUsers" class="btn btn-outline-secondary">Clear</a>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
                         }
                     </div>
                 </div>
