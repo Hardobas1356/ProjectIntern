@@ -48,48 +48,52 @@ namespace ProjectIntern.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnGetAsync()
         {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+            //ApplicationUser user = await _userManager.GetUserAsync(User);
+            //if (user == null)
+            //{
+            //    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            //}
 
-            await LoadAsync(user);
-            return Page();
+            //await LoadAsync(user);
+            //return Page();
+
+             return RedirectToPage("./Index");
         }
 
         public async Task<IActionResult> OnPostChangeEmailAsync()
         {
-            ApplicationUser user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
-            }
+            //ApplicationUser user = await _userManager.GetUserAsync(User);
+            //if (user == null)
+            //{
+            //    return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            //}
 
-            if (!ModelState.IsValid)
-            {
-                await LoadAsync(user);
-                return Page();
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    await LoadAsync(user);
+            //    return Page();
+            //}
 
-            string email = await _userManager.GetEmailAsync(user);
-            if (Input.NewEmail != email)
-            {
-                var setEmailResult = await _userManager.SetEmailAsync(user, Input.NewEmail);
-                if (!setEmailResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set email.";
-                    return RedirectToPage();
-                }
+            //string email = await _userManager.GetEmailAsync(user);
+            //if (Input.NewEmail != email)
+            //{
+            //    var setEmailResult = await _userManager.SetEmailAsync(user, Input.NewEmail);
+            //    if (!setEmailResult.Succeeded)
+            //    {
+            //        StatusMessage = "Unexpected error when trying to set email.";
+            //        return RedirectToPage();
+            //    }
 
-                await _signInManager.RefreshSignInAsync(user);
+            //    await _signInManager.RefreshSignInAsync(user);
 
-                StatusMessage = "Your profile email has been updated successfully.";
-                return RedirectToPage();
-            }
+            //    StatusMessage = "Your profile email has been updated successfully.";
+            //    return RedirectToPage();
+            //}
 
-            StatusMessage = "Your email is unchanged.";
-            return RedirectToPage();
+            //StatusMessage = "Your email is unchanged.";
+            //return RedirectToPage();
+
+            return RedirectToPage("./Index");
         }
     }
 }
