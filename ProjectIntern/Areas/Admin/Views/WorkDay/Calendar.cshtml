@@ -36,12 +36,6 @@
                 End: @Model.InternshipEndDate.Value.ToString("dd MMM yyyy")
             </span>
         }
-        @if (Model.HasCompletedCurriculum)
-        {
-            <span class="badge bg-success">
-                Curriculum complete
-            </span>
-        }
         <a asp-controller="User" asp-action="Index" class="btn btn-sm btn-outline-secondary ms-auto">
             Back
         </a>

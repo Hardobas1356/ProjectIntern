@@ -38,7 +38,6 @@ public class ApplicationUserService : IApplicationUserService
         {
             user.InternshipSpecialityId = model.InternshipSpecialityId;
             user.LastAssignedTopicId = null;
-            user.HasCompletedCurriculum = false;
             user.CompletedTopicsCount = 0;
         }
 
@@ -48,8 +47,6 @@ public class ApplicationUserService : IApplicationUserService
         user.InternshipStartDate = model.InternshipStartDate.HasValue
                 ? DateTime.SpecifyKind(model.InternshipStartDate.Value, DateTimeKind.Utc)
                 : null;
-        user.HasCompletedCurriculum = model.HasCompletedCurriculum;
-
         user.InternshipEndDate = model.InternshipEndDate.HasValue
             ? DateTime.SpecifyKind(model.InternshipEndDate.Value, DateTimeKind.Utc)
             : null;
@@ -108,7 +105,6 @@ public class ApplicationUserService : IApplicationUserService
                     : "No Speciality (Admin/Unassigned)",
                 IsDeleted = u.IsDeleted,
                 CompletedTopicsCount = u.CompletedTopicsCount,
-                HasCompletedCurriculum = u.HasCompletedCurriculum,
             });
 
         return await PaginatedResult<UserAdminViewModel>.CreateAsync(users, pageNumber, pageSize);
@@ -137,7 +133,6 @@ public class ApplicationUserService : IApplicationUserService
             InternshipSpecialityName = user.InternshipSpeciality?.Name,
             InternshipStartDate = user.InternshipStartDate,
             InternshipEndDate = user.InternshipEndDate,
-            HasCompletedCurriculum = user.HasCompletedCurriculum,
             IsAdmin = userManager.IsInRoleAsync(user, "Admin").Result,
             IsDeleted = user.IsDeleted,
             Specialities = specialities.Select(s => new SelectListItem

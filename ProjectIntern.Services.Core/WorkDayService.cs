@@ -40,8 +40,6 @@ public class WorkDayService : IWorkDayService
         if (applicationUser.InternshipSpecialityId == null)
             throw new InvalidOperationException("Intern has no speciality assigned.");
 
-        if (applicationUser.HasCompletedCurriculum)
-            throw new InvalidOperationException("Intern has completed the curriculum. No new days can be added.");
 
         List<DateTime> sortedDates = dates
             .Select(d => DateTime.SpecifyKind(d.Date, DateTimeKind.Utc))
@@ -77,6 +75,13 @@ public class WorkDayService : IWorkDayService
         if (!topics.Any())
             throw new InvalidOperationException("No active topics in this speciality.");
 
+        int lastOrder = applicationUser.LastAssignedTopic?.Order ?? -1;
+        bool hasCompleted = applicationUser.LastAssignedTopicId != null
+            && !topics.Any(t => t.Order > lastOrder);
+
+        if (hasCompleted)
+            throw new InvalidOperationException("Intern has completed the curriculum. No new days can be added.");
+
         List<DateTime> alreadyActiveDates = existingWorkDays
             .Where(w => !w.IsDeleted)
             .Select(w => DateTime.SpecifyKind(w.Date, DateTimeKind.Utc))
@@ -85,8 +90,7 @@ public class WorkDayService : IWorkDayService
         if (alreadyActiveDates.Any())
             throw new InvalidOperationException(
                 $"The following dates already have work days assigned: {string.Join(", ", alreadyActiveDates.Select(d => d.ToString("yyyy-MM-dd")))}");
-
-        int lastOrder = applicationUser.LastAssignedTopic?.Order ?? -1;
+        
         int newDatesCount = sortedDates
             .Count(d => !existingWorkDays.Any(w => w.Date == d));
         int remainingTopics = topics.Count(t => t.Order > lastOrder);
@@ -126,11 +130,6 @@ public class WorkDayService : IWorkDayService
 
             lastOrder = nextTopic.Order;
             applicationUser.LastAssignedTopicId = nextTopic.Id;
-
-            if (topics.Last().Id == nextTopic.Id)
-            {
-                applicationUser.HasCompletedCurriculum = true;
-            }
         }
 
         await userManager.UpdateAsync(applicationUser);
@@ -203,7 +202,6 @@ public class WorkDayService : IWorkDayService
             SpecialityName = applicationUser.InternshipSpeciality?.Name ?? "N/A",
             InternshipStartDate = applicationUser.InternshipStartDate,
             InternshipEndDate = applicationUser.InternshipEndDate,
-            HasCompletedCurriculum = applicationUser.HasCompletedCurriculum,
             WorkDays = await query.Select(w => new WorkDayAdminViewModel
             {
                 Id = w.Id,
@@ -238,6 +236,9 @@ public class WorkDayService : IWorkDayService
             .ToListAsync();
 
         int completedTopicsCount = workDays.Count(w => w.IsRevealed);
+        bool hasCompleted = applicationUser.LastAssignedTopicId != null
+    && !applicationUser.InternshipSpeciality!.Topics
+        .Any(t => !t.IsDeleted && t.Order > (applicationUser.LastAssignedTopic?.Order ?? -1));
 
         return new InternCalendarViewModel
         {
@@ -246,7 +247,6 @@ public class WorkDayService : IWorkDayService
             SpecialityName = applicationUser.InternshipSpeciality?.Name ?? "N/A",
             InternshipStartDate = applicationUser.InternshipStartDate,
             InternshipEndDate = applicationUser.InternshipEndDate,
-            HasCompletedCurriculum = applicationUser.HasCompletedCurriculum,
             CompletedTopicsCount = completedTopicsCount,
             WorkDays = workDays
         };
@@ -259,6 +259,8 @@ public class WorkDayService : IWorkDayService
              .IgnoreQueryFilters()
              .Where(u => u.Id == internId)
              .Include(u => u.InternshipSpeciality)
+                .ThenInclude(s => s!.Topics.Where(t => !t.IsDeleted))
+             .Include(u => u.LastAssignedTopic)
              .FirstOrDefaultAsync();
 
         if (applicationUser == null)

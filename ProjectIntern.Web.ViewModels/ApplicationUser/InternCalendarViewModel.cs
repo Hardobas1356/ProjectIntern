@@ -9,7 +9,6 @@ public class InternCalendarViewModel
     public string SpecialityName { get; set; } = null!;
     public DateTime? InternshipStartDate { get; set; }
     public DateTime? InternshipEndDate { get; set; }
-    public bool HasCompletedCurriculum { get; set; }
     public int CompletedTopicsCount { get; set; }
     public IReadOnlyList<WorkDayViewModel> WorkDays { get; set; } = new List<WorkDayViewModel>();
 }

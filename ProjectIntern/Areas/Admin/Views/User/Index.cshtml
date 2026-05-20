@@ -101,18 +101,7 @@
                                     <td>@user.University</td>
                                     <td>@user.CreationDate</td>
                                     <td class="text-center">
-                                        @if (user.HasCompletedCurriculum)
-                                        {
-                                            <span class="badge bg-success">Completed</span>
-                                        }
-                                        else if (user.CompletedTopicsCount == 0)
-                                        {
-                                            <span class="badge bg-secondary">Not started</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-primary">@user.CompletedTopicsCount topics done</span>
-                                        }
+                                        <span class="badge bg-primary">@user.CompletedTopicsCount topics done</span>
                                     </td>
                                     <td class="text-center">
                                         @if (user.IsDeleted)
@@ -127,10 +116,10 @@
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-1">
 
-                                           <a asp-action="Edit" asp-route-id="@user.Id"
-                                               class="btn btn-sm btn-outline-warning">
-                                               Edit
-                                           </a>
+                                            <a asp-action="Edit" asp-route-id="@user.Id"
+                                                   class="btn btn-sm btn-outline-warning">
+                                                Edit
+                                            </a>
 
                                             <a asp-area="Admin" asp-controller="WorkDay" asp-action="Calendar" asp-route-internId="@user.Id"
                                                    class="btn btn-sm btn-outline-info @(user.InternshipSpeciality == "No Speciality (Admin/Unassigned)" ? "disabled" : "")"

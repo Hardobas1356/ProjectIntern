@@ -74,9 +74,6 @@ public class UserController : BaseAdminController
             await applicationUserService.EditUserAsync(model);
             TempData["SuccessMessage"] = "User details updated successfully.";
 
-            if (model.InternshipSpecialityId != null)
-                TempData["WarningMessage"] = "Speciality was changed — curriculum progress has been reset.";
-
             return RedirectToAction(nameof(Index));
         }
         catch (Exception ex)

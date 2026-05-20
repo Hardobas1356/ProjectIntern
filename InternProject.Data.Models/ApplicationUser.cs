@@ -11,7 +11,6 @@ public class ApplicationUser : IdentityUser<Guid>
     public string? University { get; set; } = null!;
     public int CompletedTopicsCount { get; set; } = 0;
     public bool IsDeleted { get; set; } = false;
-    public bool HasCompletedCurriculum { get; set; } = false;
 
 
     public Guid? LastAssignedTopicId { get; set; }
