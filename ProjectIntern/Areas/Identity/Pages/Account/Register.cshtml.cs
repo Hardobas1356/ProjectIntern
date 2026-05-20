@@ -61,43 +61,47 @@ public class RegisterModel : PageModel
         public string ConfirmPassword { get; set; }
     }
 
-    public async Task OnGetAsync(string returnUrl = null)
+    public async Task<IActionResult> OnGetAsync(string returnUrl = null)
     {
-        ReturnUrl = returnUrl;
-        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        //ReturnUrl = returnUrl;
+        //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+        return RedirectToPage("./Login");
     }
 
     public async Task<IActionResult> OnPostAsync(string returnUrl = null)
     {
-        returnUrl ??= Url.Content("~/");
-        ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+        //returnUrl ??= Url.Content("~/");
+        //ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-        if (ModelState.IsValid)
-        {
-            var user = CreateUser();
+        //if (ModelState.IsValid)
+        //{
+        //    var user = CreateUser();
 
 
-            await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
-            user.Email = Input.Email;
-            user.Name = Input.Name;
+        //    await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
+        //    user.Email = Input.Email;
+        //    user.Name = Input.Name;
 
-            var result = await _userManager.CreateAsync(user, Input.Password);
+        //    var result = await _userManager.CreateAsync(user, Input.Password);
 
-            if (result.Succeeded)
-            {
-                _logger.LogInformation("User created a new internal account.");
+        //    if (result.Succeeded)
+        //    {
+        //        _logger.LogInformation("User created a new internal account.");
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return LocalRedirect(returnUrl);
-            }
+        //        await _signInManager.SignInAsync(user, isPersistent: false);
+        //        return LocalRedirect(returnUrl);
+        //    }
 
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-        }
+        //    foreach (var error in result.Errors)
+        //    {
+        //        ModelState.AddModelError(string.Empty, error.Description);
+        //    }
+        //}
 
-        return Page();
+        //return Page();
+
+        return RedirectToPage("./Login");
     }
 
     private ApplicationUser CreateUser()
