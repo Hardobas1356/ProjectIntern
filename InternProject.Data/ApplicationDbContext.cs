@@ -3,26 +3,25 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ProjectIntern.Data
+namespace ProjectIntern.Data;
+
+public class ApplicationDbContext
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    public class ApplicationDbContext
-        : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
+    }
 
-        public virtual DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
-        public virtual DbSet<InternshipSpeciality> InternshipSpecialities { get; set; } = null!;
-        public virtual DbSet<Topic> Topics { get; set; } = null!;
-        public virtual DbSet<WorkDayAssignment> WorkDayAssignments { get; set; } = null!;
+    public virtual DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
+    public virtual DbSet<InternshipSpeciality> InternshipSpecialities { get; set; } = null!;
+    public virtual DbSet<Topic> Topics { get; set; } = null!;
+    public virtual DbSet<WorkDayAssignment> WorkDayAssignments { get; set; } = null!;
 
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
 
-            builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        }
+        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
     }
 }

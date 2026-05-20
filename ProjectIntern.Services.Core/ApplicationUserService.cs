@@ -138,6 +138,7 @@ public class ApplicationUserService : IApplicationUserService
             InternshipStartDate = user.InternshipStartDate,
             InternshipEndDate = user.InternshipEndDate,
             HasCompletedCurriculum = user.HasCompletedCurriculum,
+            IsAdmin = userManager.IsInRoleAsync(user, "Admin").Result,
             Specialities = specialities.Select(s => new SelectListItem
             {
                 Value = s.Id.ToString(),

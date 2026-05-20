@@ -124,6 +124,54 @@ public class UserController : BaseAdminController
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> HardDeleteUser(Guid id)
+    {
+        //try
+        //{
+        //    await applicationUserService.HardDeleteUserAsync(id);
+        //    TempData["SuccessMessage"] = "User has been permanently deleted.";
+        //}
+        //catch (Exception ex)
+        //{
+        //    logger.LogError(ex, $"Error permanently deleting user {id}");
+        //    TempData["ErrorMessage"] = "Failed to permanently delete the user.";
+        //}
+        //return RedirectToAction(nameof(Index));
+        throw new NotImplementedException("Hard delete is not implemented to prevent accidental data loss.");
+    }
+
+    public async Task<IActionResult> MakeAdmin(Guid id)
+    {
+        try
+        {
+            await applicationUserService.MakeAdminAsync(id);
+            TempData["SuccessMessage"] = "User has been granted admin privileges.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error granting admin privileges to user {id}");
+            TempData["ErrorMessage"] = "Failed to grant admin privileges.";
+        }
+        return RedirectToAction(nameof(Edit), new { id });
+    }
+
+    public async Task<IActionResult> RemoveAdmin(Guid id, Guid actingUserId)
+    {
+        try
+        {
+            await applicationUserService.RemoveAdminAsync(id, actingUserId);
+            TempData["SuccessMessage"] = "Admin privileges have been revoked from the user.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error revoking admin privileges from user {id}");
+            TempData["ErrorMessage"] = "Failed to revoke admin privileges.";
+        }
+        return RedirectToAction(nameof(Edit), new { id });
+    }
+
     private async Task RefreshSpecialitiesAsync(UserEditInputModel model)
     {
         try

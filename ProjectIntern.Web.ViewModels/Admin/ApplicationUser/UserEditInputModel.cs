@@ -27,5 +27,6 @@ public class UserEditInputModel
     public DateTime? InternshipEndDate { get; set; }
     [Display(Name = "Has Completed Curriculum")]
     public bool HasCompletedCurriculum { get; set; } = false;
+    public bool IsAdmin { get; set; } = false;
     public IEnumerable<SelectListItem> Specialities { get; set; } = new HashSet<SelectListItem>();
 }
