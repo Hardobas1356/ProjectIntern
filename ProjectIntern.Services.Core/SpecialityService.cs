@@ -1,5 +1,6 @@
 ﻿using ForumApp.GCommon;
 using InternSolution.Data.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
@@ -221,5 +222,17 @@ public class SpecialityService : ISpecialityService
         {
             throw new Exception("Failed to save the new topic order.", ex);
         }
+    }
+
+    public async Task<IEnumerable<SelectListItem>> GetSpecialitySelectListAsync()
+    {   
+        IEnumerable<InternshipSpeciality> specialities =
+               await specialityRepo.GetAllAsync(asNoTracking: true);
+
+        return specialities.Select(s => new SelectListItem
+        {
+            Value = s.Id.ToString(),
+            Text = s.Name
+        });
     }
 }

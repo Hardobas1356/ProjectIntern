@@ -40,9 +40,11 @@
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center">
             <div>
-                <i class="fas fa-table me-1"></i>
                 Registered Application Users
             </div>
+            <a asp-action="Create" class="btn btn-sm btn-success">
+                <i class="fas fa-plus me-1"></i> Create User
+            </a>
         </div>
         <div class="card-body">
             <form asp-area="Admin" asp-controller="User" asp-action="Index" method="get" class="row g-3 mb-4 align-items-center">
@@ -51,7 +53,7 @@
                         <input type="text" name="searchTerm" value="@ViewData["SearchTerm"]"
                                class="form-control" placeholder="Search by name" />
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Search
+                            Search
                         </button>
                         @if (!string.IsNullOrWhiteSpace(ViewData["SearchTerm"]?.ToString()))
                         {
@@ -68,6 +70,7 @@
                     </div>
                 </div>
             </form>
+
 
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle">

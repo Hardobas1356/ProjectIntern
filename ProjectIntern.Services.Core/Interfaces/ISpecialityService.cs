@@ -1,5 +1,6 @@
 ﻿using ForumApp.GCommon;
 using InternSolution.Data.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
 
 namespace ProjectIntern.Services.Core.Interfaces;
@@ -14,5 +15,6 @@ public interface ISpecialityService
     public Task<InternshipSpecialityEditInputModel> GetSpecialityForEditAsync(Guid id);
     public Task EditSpecialityAsync(InternshipSpecialityEditInputModel inputModel);
     public Task ReorderTopicsAsync(Guid specialityId, List<Guid> orderedTopicIds);
+    public Task<IEnumerable<SelectListItem>> GetSpecialitySelectListAsync();
 
 }

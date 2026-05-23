@@ -8,6 +8,9 @@ public class UserCreateAdminInputModel
     [Required]
     [MaxLength(100)]
     public string Name { get; set; } = null!;
+    [Required]
+    [MaxLength(100)]
+    public string Username { get; set; } = null!;
 
     [Required]
     [MinLength(8)]

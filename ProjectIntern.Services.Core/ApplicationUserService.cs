@@ -23,6 +23,39 @@ public class ApplicationUserService : IApplicationUserService
         this.internSpecialityRepo = internSpecialityRepo ?? throw new ArgumentNullException(nameof(internSpecialityRepo));
     }
 
+    public async Task CreateUserAsync(UserCreateAdminInputModel model)
+    {
+        var existingUser = await userManager.FindByNameAsync(model.Username);
+        if (existingUser != null)
+        {
+            throw new InvalidOperationException("A user with this username already exists.");
+        }
+
+        ApplicationUser user = new ApplicationUser
+        {
+            Name = model.Name,
+            Email = null, // Email is not used in this application, so we set it to null
+            UserName = model.Username,
+            University = model.University,
+            InternshipSpecialityId = model.InternshipSpecialityId,
+            InternshipStartDate = model.InternshipStartDate.HasValue
+                    ? DateTime.SpecifyKind(model.InternshipStartDate.Value, DateTimeKind.Utc)
+                    : null,
+            InternshipEndDate = model.InternshipEndDate.HasValue
+                    ? DateTime.SpecifyKind(model.InternshipEndDate.Value, DateTimeKind.Utc)
+                    : null,
+            CreationDate = DateTime.UtcNow
+        };
+
+        IdentityResult result = await userManager.CreateAsync(user, model.Password);
+
+        if (!result.Succeeded)
+        {
+            string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException(errors);
+        }
+    }
+
     public async Task EditUserAsync(UserEditInputModel model)
     {
         ApplicationUser? user = await userManager.Users

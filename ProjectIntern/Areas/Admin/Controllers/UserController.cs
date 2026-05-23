@@ -9,11 +9,15 @@ namespace ProjectIntern.Areas.Admin.Controllers;
 public class UserController : BaseAdminController
 {
     private IApplicationUserService applicationUserService;
+    private ISpecialityService specialityService;
     private ILogger<UserController> logger;
 
-    public UserController(IApplicationUserService applicationUserService, ILogger<UserController> logger)
+    public UserController(IApplicationUserService applicationUserService,
+        ISpecialityService specialityService,
+        ILogger<UserController> logger)
     {
         this.applicationUserService = applicationUserService;
+        this.specialityService = specialityService;
         this.logger = logger;
     }
 
@@ -180,12 +184,49 @@ public class UserController : BaseAdminController
         return RedirectToAction(nameof(Index));
     }
 
-    private async Task RefreshSpecialitiesAsync(UserEditInputModel model)
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+        UserCreateAdminInputModel model = new UserCreateAdminInputModel();
+        await RefreshSpecialitiesAsync(model);
+        return View(model);
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(UserCreateAdminInputModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            await RefreshSpecialitiesAsync(model);
+            return View(model);
+        }
+
+        try
+        {
+            await applicationUserService.CreateUserAsync(model);
+            TempData["SuccessMessage"] = "New user has been created successfully.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            await RefreshSpecialitiesAsync(model);
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error creating new user.");
+            TempData["ErrorMessage"] = "Failed to create the user.";
+            await RefreshSpecialitiesAsync(model);
+            return View(model);
+        }
+    }
+
+    private async Task RefreshSpecialitiesAsync(dynamic model)
     {
         try
         {
-            UserEditInputModel refreshedModel = await applicationUserService.GetUserForEditAsync(model.Id);
-            model.Specialities = refreshedModel.Specialities;
+            model.Specialities = await specialityService.GetSpecialitySelectListAsync();
         }
         catch
         {
