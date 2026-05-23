@@ -1,6 +1,51 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Privacy Policy & System Notice";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container my-5" style="max-width: 800px;">
+    <div class="card shadow-sm border-0 bg-light p-4 p-md-5">
+        <h1 class="display-5 text-primary mb-3">@ViewData["Title"]</h1>
+        <p class="text-muted mb-4">Last Updated: @DateTime.UtcNow.ToString("dd MMMM yyyy")</p>
+        
+        <hr class="my-4">
+
+        <section class="mb-4">
+            <h4 class="text-dark fw-semibold">1. Data Controller & Deployment</h4>
+            <p class="text-secondary lh-lg">
+                This instance of the Internship Curriculum Tracker is deployed by and hosted on the infrastructure of <strong>aks.bg</strong> ("the Company"). The Company acts as the sole Data Controller for all student, intern, and administrator metrics processed within this database.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h4 class="text-dark fw-semibold">2. Software Licensing & Liability Disclosures</h4>
+            <p class="text-secondary lh-lg">
+                This application architecture is independent software provided to the Company under the terms of the <strong>MIT License</strong>. The software author provides the codebase "AS IS" without express or implied warranty of any kind. The author does not own, access, manage, or host the underlying data entries or server logs generated through company usage.
+            </p>
+        </section>
+
+        <section class="mb-4">
+            <h4 class="text-dark fw-semibold">3. Collected Data Metrics</h4>
+            <p class="text-secondary lh-lg">
+                To support active operational workflows, this instance processes:
+            </p>
+            <ul class="text-secondary lh-lg mb-3">
+                <li><strong>Identity References:</strong> Display names, affiliated university information, and localized platform usernames.</li>
+                <li><strong>Curriculum Progress:</strong> Scheduled calendar workdays, completed topics, and program timeline milestones.</li>
+                <li><strong>Security Details:</strong> Secure, one-way cryptographically hashed login credentials.</li>
+            </ul>
+        </section>
+
+        <section class="mb-4">
+            <h4 class="text-dark fw-semibold">4. Access and Rectification</h4>
+            <p class="text-secondary lh-lg">
+                Any requests regarding data modification, export, or removal (in accordance with local data protection regulations) should be directed exclusively to the Company’s designated system administrators or HR team.
+            </p>
+        </section>
+
+        <div class="alert alert-info border-0 mt-5 p-3 rounded shadow-sm small text-dark d-flex align-items-center">
+            <div>
+                <strong>Security Architecture:</strong> This platform incorporates anti-forgery system checks (`__RequestVerificationToken`) and session-level security handling to protect your authenticated connection against external cross-script inspection or unauthorized manipulation.
+            </div>
+        </div>
+    </div>
+</div>
