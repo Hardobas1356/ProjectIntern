@@ -122,160 +122,22 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="~/js/admin/admin-calendar-manage.js"></script>
+    
     <script>
-        const internId = '@Model.InternId';
-        const addUrl = '@Url.Action("AddDays", "WorkDay")';
-        const removeUrl = '@Url.Action("RemoveDays", "WorkDay")';
-        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
-        const existingDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayDates));
-        const workDayMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayMap));
+        // Package runtime Razor variables securely into config JSON layout
+        const adminCalendarConfig = {
+        internId: '@Model.InternId',
+        addUrl: '@Url.Action("AddDays", "WorkDay")',
+        removeUrl: '@Url.Action("RemoveDays", "WorkDay")',
+        existingDates: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayDates)),
+        workDayMap: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(workDayMap)),
+        minDate: @(Model.InternshipStartDate.HasValue ? Html.Raw($"'{Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")}'") : Html.Raw("null")),
+        maxDate: @(Model.InternshipEndDate.HasValue ? Html.Raw($"'{Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")}'") : Html.Raw("null")),
+        antiforgeryTokenHtml: '@Html.AntiForgeryToken()'
+        };
 
-        @if (Model.InternshipStartDate.HasValue)
-        {
-            <text>const minDate = '@Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")';</text>
-        }
-        else
-        {
-
-            <text>const minDate = null;</text>
-        }
-
-        @if (Model.InternshipEndDate.HasValue)
-        {
-            <text>const maxDate = '@Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")';</text>
-        }
-        else
-        {
-
-            <text>const maxDate = null;</text>
-        }
-
-        let selectedDates = [];
-
-        const fp = flatpickr("#calendar-input", {
-        mode: "multiple",
-        inline: true,
-        dateFormat: "Y-m-d",
-        minDate: minDate,
-        maxDate: maxDate,
-        disableMobile: true,
-        onChange: function(dates) {
-        selectedDates = dates.map(d => formatDate(d));
-        updateSummary();
-        updateButtons();
-        if (selectedDates.length === 1 && existingDates.includes(selectedDates[0]))
-        previewDay(selectedDates[0]);
-        },
-        onDayCreate: function(dObj, dStr, fp, dayElem) {
-        const dateStr = formatDate(dayElem.dateObj);
-        if (existingDates.includes(dateStr)) {
-        dayElem.style.background = '#cfe2ff';
-        dayElem.style.color = '#0a58ca';
-        dayElem.style.borderRadius = '4px';
-        }
-        }
-        });
-
-        function formatDate(d) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-        }
-
-        function updateSummary() {
-        const el = document.getElementById('summary-text');
-        if (!selectedDates.length) { el.innerHTML = 'No dates selected'; return; }
-        const newDates = selectedDates.filter(d => !existingDates.includes(d));
-        const existing = selectedDates.filter(d => existingDates.includes(d));
-        let parts = [];
-        if (newDates.length) parts.push(`<strong class="text-primary">${newDates.length} new</strong>`);
-        if (existing.length) parts.push(`<strong class="text-danger">${existing.length} to remove</strong>`);
-        el.innerHTML = `<span class="badge bg-primary me-1">${selectedDates.length}</span> ${parts.join(' · ')} selected`;
-        }
-
-        function updateButtons() {
-        document.getElementById('btn-add').disabled = !selectedDates.some(d => !existingDates.includes(d));
-        document.getElementById('btn-remove').disabled = !selectedDates.some(d => existingDates.includes(d));
-        }
-
-        function clearSelection() {
-        fp.clear();
-        selectedDates = [];
-        updateSummary();
-        updateButtons();
-        }
-
-        function previewDay(dateStr) {
-        document.querySelectorAll('.day-row').forEach(r => r.classList.remove('active'));
-        document.querySelector(`.day-row[data-date="${dateStr}"]`)?.classList.add('active');
-        const preview = document.getElementById('topic-preview');
-        const data = workDayMap[dateStr];
-        if (!data) { preview.innerHTML = `<p class="text-muted mt-3">No data for this day</p>`; return; }
-        const formatted = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-        preview.innerHTML = `
-        <p class="text-muted small text-uppercase fw-semibold mb-1 mt-2">${formatted}</p>
-        <h5 class="fw-bold">${data.TopicName ?? ''}</h5>
-        <p class="text-muted">${data.TopicDescription ?? ''}</p>`;
-        }
-
-        async function addDays() {
-        const newDates = selectedDates.filter(d => !existingDates.includes(d));
-        if (!newDates.length) return;
-        setLoading('btn-add', true);
-        try {
-        const res = await fetch(addUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
-        body: JSON.stringify({ internId, dates: newDates })
-        });
-        const json = await res.json();
-        res.ok ? toast('success', json.message ?? 'Work days added.') : toast('danger', json.message ?? 'Failed to add work days.');
-        if (res.ok) setTimeout(() => location.reload(), 1000);
-        } catch { toast('danger', 'Network error. Please try again.'); }
-        finally { setLoading('btn-add', false); }
-        }
-
-        async function removeDays() {
-        const toRemove = selectedDates.filter(d => existingDates.includes(d));
-        if (!toRemove.length) return;
-        const past = toRemove.filter(d => new Date(d) < new Date(new Date().toDateString()));
-        if (past.length && !confirm(`${past.length} day(s) have already passed. Removing them will not affect curriculum progress. Continue?`)) return;
-        setLoading('btn-remove', true);
-        try {
-        const res = await fetch(removeUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'RequestVerificationToken': token },
-        body: JSON.stringify({ internId, dates: toRemove })
-        });
-        const json = await res.json();
-        res.ok ? toast('success', json.message ?? 'Work days removed.') : toast('danger', json.message ?? 'Failed to remove work days.');
-        if (res.ok) setTimeout(() => location.reload(), 1000);
-        } catch { toast('danger', 'Network error. Please try again.'); }
-        finally { setLoading('btn-remove', false); }
-        }
-
-        function setLoading(btnId, loading) {
-        const btn = document.getElementById(btnId);
-        btn.disabled = loading;
-        btn.innerHTML = loading ? 'Saving...' : (btn.dataset.original ?? btn.innerHTML);
-        if (!loading) { btn.dataset.original = btn.innerHTML; updateButtons(); }
-        }
-
-        function toast(type, message) {
-        const el = document.createElement('div');
-        el.className = `alert alert-${type} alert-dismissible fade show shadow-sm`;
-        el.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
-        document.getElementById('toast-container').appendChild(el);
-        setTimeout(() => el.remove(), 4000);
-        }
-
-        (function ensureToken() {
-        if (!document.querySelector('input[name="__RequestVerificationToken"]')) {
-        const f = document.createElement('form');
-        f.innerHTML = '@Html.AntiForgeryToken()';
-        document.body.appendChild(f);
-        }
-        })();
+        // Fire calendar engine execution initialization
+        initializeAdminCalendar(adminCalendarConfig);
     </script>
 }
