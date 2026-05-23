@@ -89,6 +89,29 @@ public class UserController : BaseAdminController
             return View("Edit", model);
         }
     }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ResetPassword(Guid id, string newPassword)
+    {
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+        {
+            TempData["ErrorMessage"] = "Password must be at least 8 characters long.";
+            return RedirectToAction(nameof(Edit), new { id });
+        }
+
+        try
+        {
+            await applicationUserService.ResetUserPasswordAsync(id, newPassword);
+            TempData["SuccessMessage"] = "User password has been updated successfully.";
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, $"Error resetting password for user {id}");
+            TempData["ErrorMessage"] = "Failed to update user password.";
+        }
+
+        return RedirectToAction(nameof(Edit), new { id });
+    }
 
     [HttpPost]
     [ValidateAntiForgeryToken]

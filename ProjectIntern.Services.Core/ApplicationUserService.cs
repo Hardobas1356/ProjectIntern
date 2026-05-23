@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using static ForumApp.GCommon.GlobalConstants;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Services.Core.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ProjectIntern.Services.Core;
 
@@ -222,6 +223,26 @@ public class ApplicationUserService : IApplicationUserService
         if (user != null)
         {
             await userManager.RemoveFromRoleAsync(user, "Admin");
+        }
+    }
+    public async Task ResetUserPasswordAsync(Guid userId, string newPassword)
+    {
+        ApplicationUser? user = await userManager.Users
+                .IgnoreQueryFilters()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+        {
+            throw new KeyNotFoundException($"User with ID {userId} not found.");
+        }
+
+        string resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
+        IdentityResult result = await userManager.ResetPasswordAsync(user, resetToken, newPassword);
+
+        if (!result.Succeeded)
+        {
+            string errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new InvalidOperationException($"Failed to reset password: {errors}");
         }
     }
 
