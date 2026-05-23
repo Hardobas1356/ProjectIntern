@@ -98,7 +98,7 @@ using (var scope = app.Services.CreateScope())
     IServiceProvider services = scope.ServiceProvider;
     try
     {
-        await DbSeeder.SeedAdminAsync(services);
+        await DbSeeder.SeedDataAsync(services);
     }
     catch (Exception ex)
     {
