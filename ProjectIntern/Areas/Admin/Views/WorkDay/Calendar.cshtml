@@ -125,7 +125,6 @@
     <script src="~/js/admin/admin-calendar-manage.js"></script>
     
     <script>
-        // Package runtime Razor variables securely into config JSON layout
         const adminCalendarConfig = {
         internId: '@Model.InternId',
         addUrl: '@Url.Action("AddDays", "WorkDay")',
@@ -137,7 +136,6 @@
         antiforgeryTokenHtml: '@Html.AntiForgeryToken()'
         };
 
-        // Fire calendar engine execution initialization
         initializeAdminCalendar(adminCalendarConfig);
     </script>
 }
