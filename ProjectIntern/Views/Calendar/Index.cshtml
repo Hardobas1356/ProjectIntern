@@ -196,80 +196,23 @@
 </div>
 
 @section Scripts {
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-    const revealedDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revealedDates));
-    const upcomingDates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(upcomingDates));
-    const revealedMap = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revealedMap));
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="~/js/admin/intern-calendar.js"></script>
 
-    @if (Model.InternshipStartDate.HasValue)
-    {<text>const minDate = '@Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")';</text>}
-    else
-    {<text>const minDate = null;</text>}
+    <script>
+        // Inject and process Razor models onto a isolated data block
+        const calendarConfig = {
+            revealedDates: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revealedDates)),
+            upcomingDates: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(upcomingDates)),
+            revealedMap: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(revealedMap)),
+            minDate: @(Model.InternshipStartDate.HasValue ? Html.Raw($"'{Model.InternshipStartDate.Value.ToString("yyyy-MM-dd")}'") : Html.Raw("null")),
+            maxDate: @(Model.InternshipEndDate.HasValue ? Html.Raw($"'{Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")}'") : Html.Raw("null"))
+        };
 
-    @if (Model.InternshipEndDate.HasValue)
-    {<text>const maxDate = '@Model.InternshipEndDate.Value.ToString("yyyy-MM-dd")';</text>}
-    else
-    {<text>const maxDate = null;</text>}
+        // Attach the data map globally so the inline onclick="previewDay(...)" element handler still works seamlessly
+        window.internCalendarDataMap = calendarConfig.revealedMap;
 
-    function formatDate(d) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    flatpickr("#calendar-input", {
-        mode: "single",
-        inline: true,
-        dateFormat: "Y-m-d",
-        minDate: minDate,
-        maxDate: maxDate,
-        clickOpens: false,
-        disableMobile: true,
-        onChange: function(dates) {
-            if (!dates.length) return;
-            const dateStr = formatDate(dates[0])
-            if (revealedDates.includes(dateStr)) previewDay(dateStr);
-        },
-        onDayCreate: function(dObj, dStr, fp, dayElem) {
-            const dateStr = formatDate(dayElem.dateObj);
-            if (revealedDates.includes(dateStr)) {
-                dayElem.style.background = '#d1e7dd';
-                dayElem.style.color = '#0a3622';
-                dayElem.style.borderRadius = '4px';
-                dayElem.title = 'Covered — click to view topic';
-            } else if (upcomingDates.includes(dateStr)) {
-                dayElem.style.background = '#cfe2ff';
-                dayElem.style.color = '#0a58ca';
-                dayElem.style.borderRadius = '4px';
-                dayElem.title = 'Upcoming work day';
-            }
-        }
-    });
-
-    function previewDay(dateStr) {
-    document.querySelectorAll('.day-row').forEach(r => r.classList.remove('active'));
-    document.querySelector(`.day-row[data-date="${dateStr}"]`)?.classList.add('active');
-
-    const preview = document.getElementById('topic-preview');
-    const data = revealedMap[dateStr];
-
-    if (!data) {
-        preview.className = 'card-body text-center text-muted';
-        preview.innerHTML = `<p class="mt-3">Topic not yet revealed</p>`;
-        return;
-    }
-
-    preview.className = 'card-body';
-
-    const formatted = new Date(dateStr + 'T00:00:00')
-        .toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
-
-    preview.innerHTML = `
-        <p class="text-muted small text-uppercase fw-semibold mb-1 mt-2">${formatted}</p>
-        <h5 class="fw-bold">${data.TopicName ?? ''}</h5>
-        <p class="text-muted">${data.TopicDescription ?? ''}</p>`;
-}
-</script>
+        // Initialize calendar features using the injected configuration
+        initializeInternCalendar(calendarConfig);
+    </script>
 }
