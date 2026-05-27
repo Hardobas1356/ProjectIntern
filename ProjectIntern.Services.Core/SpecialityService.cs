@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
-using ProjectIntern.Web.ViewModels.Admin.Topic;
 
 namespace ProjectIntern.Services.Core;
 
@@ -225,7 +224,7 @@ public class SpecialityService : ISpecialityService
     }
 
     public async Task<IEnumerable<SelectListItem>> GetSpecialitySelectListAsync()
-    {   
+    {
         IEnumerable<InternshipSpeciality> specialities =
                await specialityRepo.GetAllAsync(asNoTracking: true);
 

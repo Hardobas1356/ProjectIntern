@@ -21,10 +21,10 @@ public class CalendarController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        if(User.IsInRole("Admin"))
+        if (User.IsInRole("Admin"))
         {
             return RedirectToAction("Index", "Home", new { area = "Admin" });
-        }   
+        }
 
         Guid internId = GetCurrentUserId();
 

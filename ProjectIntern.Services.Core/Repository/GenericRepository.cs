@@ -1,5 +1,5 @@
-﻿using ProjectIntern.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using ProjectIntern.Data;
 using ProjectIntern.Services.Core.Repository.Interfaces;
 using System.Linq.Expressions;
 

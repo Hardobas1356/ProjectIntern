@@ -1,5 +1,4 @@
 ﻿using ForumApp.GCommon;
-using InternSolution.Data.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
 
@@ -8,7 +7,7 @@ namespace ProjectIntern.Services.Core.Interfaces;
 public interface ISpecialityService
 {
     public Task SoftDeleteSpecialityAsync(Guid id);
-    public Task RestoreSpecialityAsync(Guid id); 
+    public Task RestoreSpecialityAsync(Guid id);
     public Task<InternshipSpecialityDetailsViewModel> GetSpecialityDetailsAsync(Guid id, bool includeDeletedTopics);
     public Task<PaginatedResult<InternshipSpecialityViewModel>> GetAllSpecialitiesAsync(int pageNumber, int pageSize, string? searchTerm, bool includeDeleted);
     public Task CreateSpecialityAsync(InternshipSpecialityCreateInputModel inputModel);

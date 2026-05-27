@@ -2,7 +2,7 @@
 
 namespace ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
 
-public class InternshipSpecialityDetailsViewModel 
+public class InternshipSpecialityDetailsViewModel
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = null!;

@@ -158,10 +158,10 @@ public class TopicService : ITopicService
 
         try
         {
-           await topicRepo.SaveChangesAsync();
+            await topicRepo.SaveChangesAsync();
         }
         catch (Exception ex)
-        { 
+        {
             throw new DbUpdateException($"Could not delete topic. Id: {id}", ex);
         }
     }
