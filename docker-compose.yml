@@ -18,7 +18,7 @@ services:
       retries: 5
     restart: always
 
-  # 2. EFC migrator service to apply database migrations before the web app starts
+ # 2. EFC migrator service to apply database migrations before the web app starts
   db-migrator:
     image: mcr.microsoft.com/dotnet/sdk:10.0
     container_name: project_intern_migrator
@@ -28,9 +28,10 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Host=db-server;Database=ProjectInternDb;Username=postgres;Password=${DB_PASSWORD}
     command: >
-      bash -c "dotnet tool install --global dotnet-ef &&
-               export PATH=\"$$PATH:$$HOME/.dotnet/tools\" &&
-               dotnet ef database update"
+        bash -c "dotnet tool install --global dotnet-ef &&
+                       export PATH=\"$$PATH:$$HOME/.dotnet/tools\" &&
+                       dotnet restore &&
+                       dotnet ef database update"
     depends_on:
       db-server:
         condition: service_healthy
