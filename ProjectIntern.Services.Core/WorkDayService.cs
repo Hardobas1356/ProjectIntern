@@ -1,4 +1,4 @@
-﻿using InternSolution.Data.Models;
+﻿using ProjectIntern.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

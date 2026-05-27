@@ -1,4 +1,4 @@
-﻿using InternSolution.Data.Models;
+﻿using ProjectIntern.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;

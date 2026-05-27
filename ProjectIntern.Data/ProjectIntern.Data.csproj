@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\InternProject.Data.Models\ProjectIntern.Data.Models.csproj" />
+    <ProjectReference Include="..\ProjectIntern.Data.Models\ProjectIntern.Data.Models.csproj" />
   </ItemGroup>
 
 </Project>

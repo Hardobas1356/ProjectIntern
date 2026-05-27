@@ -1,5 +1,5 @@
 ﻿using ForumApp.GCommon;
-using InternSolution.Data.Models;
+using ProjectIntern.Data.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;

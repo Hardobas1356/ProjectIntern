@@ -1,4 +1,4 @@
-﻿namespace InternSolution.Data.Models;
+﻿namespace ProjectIntern.Data.Models;
 
 public class Topic
 {

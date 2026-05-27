@@ -1,8 +1,8 @@
-﻿using InternSolution.Data.Models;
+﻿using ProjectIntern.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace InternProject.Data.Configurations;
+namespace ProjectIntern.Data.Configurations;
 
 public class InternshipSpecialityConfiguration : IEntityTypeConfiguration<InternshipSpeciality>
 {
