@@ -1,0 +1,57 @@
+services:
+  # 1. Db service using PostgreSQL
+  db-server:
+    image: postgres:15-alpine
+    container_name: project_intern_db
+    environment:
+      - POSTGRES_DB=ProjectInternDb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ProjectInternDb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  # 2. EFC migrator service to apply database migrations before the web app starts
+  db-migrator:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    container_name: project_intern_migrator
+    volumes:
+      - .:/src
+    working_dir: /src/ProjectIntern
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=db-server;Database=ProjectInternDb;Username=postgres;Password=${DB_PASSWORD}
+    command: >
+      bash -c "dotnet tool install --global dotnet-ef &&
+               export PATH=\"$$PATH:$$HOME/.dotnet/tools\" &&
+               dotnet ef database update"
+    depends_on:
+      db-server:
+        condition: service_healthy
+
+  # 3. web-app service for the ASP.NET Core application
+  web-app:
+    image: project-intern:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: project_intern_web
+    ports:
+      - "8080:8080"  # Exposed to port 8080 externally
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=db-server;Database=ProjectInternDb;Username=postgres;Password=${DB_PASSWORD}
+    depends_on:
+      db-migrator:
+        condition: service_completed_successfully
+    restart: always
+
+volumes:
+  pg-data:
+    driver: local

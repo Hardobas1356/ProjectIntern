@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace ForumApp.GCommon;
+namespace ProjectIntern.GCommon;
 
 public class PaginatedResult<T>
 {

@@ -17,8 +17,4 @@
     <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.7" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ForumApp.GCommon\ForumApp.GCommon.csproj" />
-  </ItemGroup>
-
 </Project>

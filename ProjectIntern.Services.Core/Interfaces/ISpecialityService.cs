@@ -1,4 +1,4 @@
-﻿using ForumApp.GCommon;
+﻿using ProjectIntern.GCommon;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjectIntern.Web.ViewModels.Admin.InternshipSpeciality;
 

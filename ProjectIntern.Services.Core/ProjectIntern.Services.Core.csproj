@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ForumApp.GCommon\ForumApp.GCommon.csproj" />
     <ProjectReference Include="..\ProjectIntern.Data.Models\ProjectIntern.Data.Models.csproj" />
     <ProjectReference Include="..\ProjectIntern.Data\ProjectIntern.Data.csproj" />
+    <ProjectReference Include="..\ProjectIntern.GCommon\ProjectIntern.GCommon.csproj" />
     <ProjectReference Include="..\ProjectIntern.Web.ViewModels\ProjectIntern.Web.ViewModels.csproj" />
   </ItemGroup>
 

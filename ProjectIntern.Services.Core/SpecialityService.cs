@@ -1,4 +1,4 @@
-﻿using ForumApp.GCommon;
+﻿using ProjectIntern.GCommon;
 using ProjectIntern.Data.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;

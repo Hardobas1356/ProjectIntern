@@ -1,4 +1,4 @@
-﻿using ForumApp.GCommon;
+﻿using ProjectIntern.GCommon;
 using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
 
 namespace ProjectIntern.Services.Core.Interfaces;

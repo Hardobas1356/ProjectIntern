@@ -1,12 +1,12 @@
-﻿using ForumApp.GCommon;
-using ProjectIntern.Data.Models;
+﻿using ProjectIntern.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjectIntern.Services.Core.Interfaces;
 using ProjectIntern.Services.Core.Repository.Interfaces;
 using ProjectIntern.Web.ViewModels.Admin.ApplicationUser;
-using static ForumApp.GCommon.GlobalConstants;
+using ProjectIntern.GCommon;
+using static ProjectIntern.GCommon.GlobalConstants;
 
 namespace ProjectIntern.Services.Core;
 

@@ -1,4 +1,4 @@
-﻿namespace ForumApp.GCommon;
+﻿namespace ProjectIntern.GCommon;
 
 public static class GlobalConstants
 {
