@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace ProjectIntern.Areas.Admin.Controllers;
 
-//[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 [Area("Admin")]
 public abstract class BaseAdminController : Controller
 {
