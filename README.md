@@ -56,11 +56,11 @@ To use the program you need to enter with the generic admin account. You **need*
 
 **Username:**
   ```
-    admin
+admin
   ```
 **Password:**
   ```
-    Admin123!
+Admin123!
   ```
 
 To shut down the application stack while keeping all saved database information intact inside your local persistent storage volume:
