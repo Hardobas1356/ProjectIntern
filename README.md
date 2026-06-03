@@ -19,7 +19,7 @@ ProjectIntern provides unified administrative dashboard. Admins can seamlessly m
 
 Clone the project repository from GitHub to your target working directory:
   ```
-   git clone [https://github.com/Hardobas1356/ProjectIntern.git](https://github.com/Hardobas1356/ProjectIntern.git)
+   git clone https://github.com/Hardobas1356/ProjectIntern.git
    cd ProjectIntern
   ```
 Create a secure environment configuration file named .env directly in the root directory (the same folder containing your docker-compose.yml). This file is hidden by .gitignore and keeps your private credentials secure:
@@ -30,7 +30,7 @@ Open the .env file in your preferred text editor and declare your secure Postgre
 
     DB_PASSWORD=YourHighlySecureDatabasePassword123!
 
-Executing program
+### Executing program
 
 Follow these step-by-step instructions to compile your solution assemblies, automatically build the tracking schema, and launch the platform:
 
