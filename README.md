@@ -52,7 +52,7 @@ Access the live, running web application platform via your internet browser at:
 
     http://localhost:8080
     
-To use the program you need to enter with the generic admin account. You **need** to make another admin account and delete the generic one.
+To use the program you need to enter with the generic admin account. You **need** to make another admin account and delete the generic one or change the password of the generic one.
 
 **Username:**
   ```
