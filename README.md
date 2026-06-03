@@ -51,6 +51,17 @@ Docker will automatically sequence the execution stack:
 Access the live, running web application platform via your internet browser at:
 
     http://localhost:8080
+    
+To use the program you need to enter with the generic admin account. You **need** to make another admin account and delete the generic one.
+
+**Username:**
+  ```
+    admin
+  ```
+**Password:**
+  ```
+    Admin123!
+  ```
 
 To shut down the application stack while keeping all saved database information intact inside your local persistent storage volume:
 
